@@ -1,0 +1,31 @@
+server:
+  port: 8082
+
+spring:
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      config:
+        username: nacos
+        file-extension: yaml
+        namespace: public
+        group: pivot-hub
+      discovery:
+        username: nacos
+        group: pivot-hub
+  application:
+    name: pivot-hub-business
+seata:
+  enabled: true
+  tx-service-group: pivot-hub
+  registry:
+    type: nacos
+    nacos:
+      application: seata-server
+      group: SEATA_GROUP
+      namespace: public
+      username: nacos
+  service:
+    vgroup-mapping:
+      pivot-hub: default

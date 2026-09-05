@@ -1,0 +1,17 @@
+spring:
+  cloud:
+    nacos:
+      config:
+        server-addr: localhost:8848
+        password: nacos
+      discovery:
+        server-addr: localhost:8848
+        password: nacos
+  config:
+    import:
+      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml
+seata:
+  registry:
+    nacos:
+      server-addr: localhost:8848
+      password: nacos
