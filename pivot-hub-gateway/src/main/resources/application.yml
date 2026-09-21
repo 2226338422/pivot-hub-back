@@ -2,5 +2,18 @@ server:
   port: 8080
 
 spring:
+  profiles:
+    active: dev
   application:
     name: pivot-hub-gateway
+  cloud:
+    nacos:
+      discovery:
+        group: pivot-hub
+        namespace: public
+        username: nacos
+      config:
+        group: pivot-hub
+        username: nacos
+        namespace: public
+        file-extension: yaml

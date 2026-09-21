@@ -16,6 +16,7 @@ spring:
         group: pivot-hub
   application:
     name: pivot-hub-system
+
 seata:
   enabled: true
   tx-service-group: pivot-hub
