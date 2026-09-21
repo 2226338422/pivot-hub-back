@@ -1,0 +1,45 @@
+package com.pivothub.pojo.po.system;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.pivothub.pojo.po.BasePo;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+/**
+ * 用户实体
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class SysUser extends BasePo {
+    @TableId(type = IdType.INPUT)
+    private String uuid;
+
+    private String code;
+
+    /** 用户名 */
+    private String username;
+
+    /** 昵称 */
+    private String nickname;
+
+    /** 密码（AES加密） */
+    private String password;
+
+    /** 手机号（AES加密） */
+    private String phone;
+
+    /** 邮箱 */
+    private String email;
+
+    /** 头像URL */
+    private String avatar;
+
+    /** 角色ID */
+    private String roleId;
+
+    /** 状态 0-禁用 1-正常 */
+    private Integer status;
+
+    private String remark;
+}

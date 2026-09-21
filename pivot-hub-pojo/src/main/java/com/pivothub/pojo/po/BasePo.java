@@ -1,8 +1,5 @@
 package com.pivothub.pojo.po;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,10 +10,12 @@ import java.util.Date;
  */
 @Data
 public abstract class BasePo implements Serializable {
-    @TableId(type = IdType.AUTO)
-    private Long id;
+    /** 创建人uuid */
+    private String createUserId;
+
+    /** 更新人uuid */
+    private String updateUserId;
+
     private Date createTime;
     private Date updateTime;
-    @TableLogic
-    private Integer deleted;
 }
