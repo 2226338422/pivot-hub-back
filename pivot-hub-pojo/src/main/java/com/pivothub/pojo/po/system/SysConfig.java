@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 系统配置实体
+ * @Description: 系统配置实体
+ * @Author lhb
+ * @CreateTime 2026/9/22 22:42
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -30,5 +32,6 @@ public class SysConfig extends BasePo {
     /** 状态 0-禁用 1-正常 */
     private Integer status;
 
+    /** 备注 */
     private String remark;
 }

@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 权限实体（关联角色或用户）
+ * @Description: 权限实体（关联角色或用户）
+ * @Author lhb
+ * @CreateTime 2026/9/22 22:42
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

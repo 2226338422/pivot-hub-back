@@ -9,7 +9,9 @@ import lombok.EqualsAndHashCode;
 import java.util.Date;
 
 /**
- * 邮箱验证码实体
+ * @Description: 邮箱验证码实体
+ * @Author lhb
+ * @CreateTime 2026/9/22 22:42
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

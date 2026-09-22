@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 用户实体
+ * @Description: 用户实体
+ * @Author lhb
+ * @CreateTime 2026/9/22 22:42
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -15,6 +17,7 @@ public class SysUser extends BasePo {
     @TableId(type = IdType.INPUT)
     private String uuid;
 
+    /** 用户编码 */
     private String code;
 
     /** 用户名 */
@@ -41,5 +44,6 @@ public class SysUser extends BasePo {
     /** 状态 0-禁用 1-正常 */
     private Integer status;
 
+    /** 备注 */
     private String remark;
 }

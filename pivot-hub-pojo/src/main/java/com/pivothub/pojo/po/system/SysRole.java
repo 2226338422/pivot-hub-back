@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 角色实体
+ * @Description: 角色实体
+ * @Author lhb
+ * @CreateTime 2026/9/22 22:42
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -15,8 +17,10 @@ public class SysRole extends BasePo {
     @TableId(type = IdType.INPUT)
     private String uuid;
 
+    /** 角色编码 */
     private String code;
 
+    /** 角色名称 */
     private String name;
 
     /** 是否默认角色 0-否 1-是 */
@@ -28,5 +32,6 @@ public class SysRole extends BasePo {
     /** 状态 0-禁用 1-正常 */
     private Integer status;
 
+    /** 备注 */
     private String remark;
 }

@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 用户平台账户实体（QQ/微信绑定等）
+ * @Description: 用户平台账户实体（QQ/微信绑定等）
+ * @Author lhb
+ * @CreateTime 2026/9/22 22:42
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -15,6 +17,7 @@ public class SysUserPlatform extends BasePo {
     @TableId(type = IdType.INPUT)
     private String uuid;
 
+    /** 用户uuid */
     private String userId;
 
     /** QQ开放平台openid（AES加密） */

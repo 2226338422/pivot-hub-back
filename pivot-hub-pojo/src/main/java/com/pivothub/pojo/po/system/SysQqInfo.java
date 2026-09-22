@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * QQ用户信息实体（参考mall的qq_info表）
+ * @Description: QQ用户信息实体（参考mall的qq_info表）
+ * @Author lhb
+ * @CreateTime 2026/9/22 22:42
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

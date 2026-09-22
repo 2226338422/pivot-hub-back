@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 菜单实体
+ * @Description: 菜单实体
+ * @Author lhb
+ * @CreateTime 2026/9/22 22:42
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -15,8 +17,10 @@ public class SysMenu extends BasePo {
     @TableId(type = IdType.INPUT)
     private String uuid;
 
+    /** 菜单编码 */
     private String code;
 
+    /** 菜单名称 */
     private String menuName;
 
     /** 父菜单uuid，0为顶级 */
