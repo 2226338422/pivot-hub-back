@@ -7,28 +7,22 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * @Description: 社区互动实体（点赞/收藏）
+ * @Description: 社区帖子点赞实体
  * @Author lhb
- * @CreateTime 2026/9/22 22:42
+ * @CreateTime 2026/9/25
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class CommunityLike extends BasePo {
+public class CommunityPostLike extends BasePo {
     @TableId(type = IdType.INPUT)
     private String uuid;
 
-    /** 目标类型 1-帖子 2-回复 */
-    private Integer targetType;
+    /** 帖子uuid */
+    private String postId;
 
-    /** 目标uuid(帖子或回复) */
-    private String targetId;
-
-    /** 操作用户uuid */
+    /** 点赞用户uuid */
     private String userId;
 
-    /** 互动类型 1-点赞 2-收藏 */
-    private Integer actionType;
-
-    /** 状态 0-已取消 1-生效 */
+    /** 状态 0-取消点赞 1-已点赞 */
     private Integer status;
 }

@@ -7,25 +7,22 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * @Description: 社区关注关系实体（粉丝/关注）
+ * @Description: 社区帖子收藏实体
  * @Author lhb
- * @CreateTime 2026/9/22 22:42
+ * @CreateTime 2026/9/25
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class CommunityFollow extends BasePo {
+public class CommunityPostFavorite extends BasePo {
     @TableId(type = IdType.INPUT)
     private String uuid;
 
-    /** 关注人用户uuid(粉丝) */
-    private String followerId;
+    /** 帖子uuid */
+    private String postId;
 
-    /** 被关注人用户uuid */
-    private String followeeId;
+    /** 收藏用户uuid */
+    private String userId;
 
-    /** 状态 0-已取消 1-已关注 */
+    /** 状态 0-取消收藏 1-已收藏 */
     private Integer status;
-
-    /** 备注 */
-    private String remark;
 }

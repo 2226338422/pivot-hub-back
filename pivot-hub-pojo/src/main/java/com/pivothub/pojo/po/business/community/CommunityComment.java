@@ -7,39 +7,33 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * @Description: 社区回帖实体（楼层/楼中楼回复）
+ * @Description: 社区评论实体
  * @Author lhb
- * @CreateTime 2026/9/22 22:42
+ * @CreateTime 2026/9/25
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class CommunityReply extends BasePo {
+public class CommunityComment extends BasePo {
     @TableId(type = IdType.INPUT)
     private String uuid;
 
     /** 所属帖子uuid */
     private String postId;
 
-    /** 父回复uuid，0为顶级(主楼回复) */
+    /** 父评论uuid，0为顶级评论 */
     private String parentId;
 
-    /** 根回复uuid，用于楼中楼归属主楼 */
+    /** 根评论uuid，用于楼中楼查询 */
     private String rootId;
 
-    /** 回复内容 */
-    private String content;
-
-    /** 作者用户uuid */
+    /** 评论用户uuid */
     private String authorId;
 
-    /** 作者昵称（冗余，便于列表展示） */
-    private String authorName;
+    /** 被回复用户uuid */
+    private String replyToUserId;
 
-    /** 楼层号 */
-    private Integer floorNum;
-
-    /** 回复数（针对主楼） */
-    private Integer replyCount;
+    /** 评论内容 */
+    private String content;
 
     /** 点赞数 */
     private Integer likeCount;
