@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.pivothub.commoncore.constants.redis.SystemRedisConstants;
 import com.pivothub.commoncore.util.CacheUtil;
-import com.pivothub.common.util.EmailApiUtil;
+import com.pivothub.system.util.EmailApiUtil;
 import com.pivothub.system.mapper.SysMailCodeMapper;
 import com.pivothub.system.service.MailCodeService;
 import org.springframework.stereotype.Service;

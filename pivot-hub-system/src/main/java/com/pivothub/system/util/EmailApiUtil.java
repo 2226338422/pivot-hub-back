@@ -1,4 +1,4 @@
-package com.pivothub.common.util;
+package com.pivothub.system.util;
 
 import jakarta.annotation.Resource;
 import jakarta.mail.internet.MimeMessage;
