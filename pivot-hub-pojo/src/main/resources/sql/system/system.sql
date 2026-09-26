@@ -161,6 +161,7 @@ CREATE TABLE IF NOT EXISTS sys_user (
     create_time    DATETIME     NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time    DATETIME     NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     UNIQUE KEY uk_sys_user_code (code),
+    UNIQUE KEY uk_sys_user_email (email),
     KEY idx_sys_user_role_id (role_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统用户表';
 
