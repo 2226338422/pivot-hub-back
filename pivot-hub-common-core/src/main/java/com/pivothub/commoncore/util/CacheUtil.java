@@ -70,6 +70,18 @@ public class CacheUtil {
         return null;
     }
 
+    public void setObject(String key, Object value, Long time, TimeUnit unit) {
+        stringRedisTemplate.opsForValue().set(key, JSONUtil.toJsonStr(value), time, unit);
+    }
+
+    public <T> T getObject(String key, Class<T> type) {
+        String value = stringRedisTemplate.opsForValue().get(key);
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
+        return JSONUtil.toBean(value, type);
+    }
+
     public List<String> multiGet(List<String> keys) {
         return stringRedisTemplate.opsForValue().multiGet(keys);
     }
