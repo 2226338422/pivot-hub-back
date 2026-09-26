@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pivothub.system.mapper.SysUserMapper">
+    <resultMap id="SysUserResultMap" type="com.pivothub.pojo.po.system.SysUser">
+        <id column="uuid" property="uuid"/>
+        <result column="code" property="code"/>
+        <result column="nickname" property="nickname"/>
+        <result column="email" property="email"/>
+        <result column="avatar" property="avatar"/>
+        <result column="role_id" property="roleId"/>
+        <result column="status" property="status"/>
+        <result column="remark" property="remark"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="update_user_id" property="updateUserId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="userColumns">
+        uuid, code, nickname, email, avatar, role_id, status, remark,
+        create_user_id, update_user_id, create_time, update_time
+    </sql>
+
+    <select id="selectByEmail" resultMap="SysUserResultMap">
+        SELECT <include refid="userColumns"/>
+        FROM sys_user WHERE email = #{email} LIMIT 1
+    </select>
+
+    <select id="selectById" resultMap="SysUserResultMap">
+        SELECT <include refid="userColumns"/>
+        FROM sys_user WHERE uuid = #{uuid} LIMIT 1
+    </select>
+
+    <insert id="insertUser" parameterType="com.pivothub.pojo.po.system.SysUser">
+        INSERT INTO sys_user
+        (uuid, code, nickname, email, avatar, role_id, status, remark,
+         create_user_id, update_user_id, create_time, update_time)
+        VALUES
+        (#{uuid}, #{code}, #{nickname}, #{email}, #{avatar}, #{roleId}, #{status}, #{remark},
+         #{createUserId}, #{updateUserId}, #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="updateProfile" parameterType="com.pivothub.pojo.po.system.SysUser">
+        UPDATE sys_user
+        SET nickname = #{nickname}, email = #{email}, avatar = #{avatar}, remark = #{remark},
+            update_user_id = #{updateUserId}, update_time = #{updateTime}
+        WHERE uuid = #{uuid}
+    </update>
+</mapper>
