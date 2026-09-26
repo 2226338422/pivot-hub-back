@@ -8,4 +8,6 @@ package com.pivothub.commoncore.constants.auth;
 public class TokenConstants {
     public static final Integer ACCESS_ERROR_CODE = 40301;
     public static final Integer ACCESS_MISS_CODE = 40302;
+    public static final String TOKEN_TYPE_ACCESS = "access";
+    public static final String TOKEN_TYPE_REFRESH = "refresh";
 }
