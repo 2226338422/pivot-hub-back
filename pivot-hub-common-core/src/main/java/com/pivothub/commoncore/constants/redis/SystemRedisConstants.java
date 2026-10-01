@@ -1,10 +1,7 @@
 package com.pivothub.commoncore.constants.redis;
 
 /** system 认证、用户资料和邮箱验证码 Redis key 常量。 */
-public final class SystemRedisConstants {
-    private SystemRedisConstants() {
-    }
-
+public class SystemRedisConstants {
     public static final String KEY_SYSTEM_UNITE_PREFIX = "pivot:system:";
     /** Web/App 登录会话 key 前缀，后接 clientType:userId。 */
     public static final String AUTH_SESSION_KEY_PREFIX = KEY_SYSTEM_UNITE_PREFIX + "auth:session:";
