@@ -41,6 +41,8 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
             "/doc.html",
             "/webjars/**",
             "/v3/api-docs/**",
+            "/doc/system/v3/api-docs/**",
+            "/doc/business/v3/api-docs/**",
             "/swagger-ui/**",
             "/favicon.ico"
     );
@@ -80,7 +82,8 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
     boolean isExemptPath(String path) {
         for (String exempt : EXEMPT_PATHS) {
             if (exempt.endsWith("/**")) {
-                if (path.startsWith(exempt.substring(0, exempt.length() - 3))) {
+                String prefix = exempt.substring(0, exempt.length() - 3);
+                if (path.equals(prefix) || path.startsWith(prefix + "/")) {
                     return true;
                 }
             } else if (path.equals(exempt)) {

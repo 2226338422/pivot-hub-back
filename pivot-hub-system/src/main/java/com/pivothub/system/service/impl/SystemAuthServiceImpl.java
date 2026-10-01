@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Locale;
 
 @Service
@@ -105,15 +106,16 @@ public class SystemAuthServiceImpl implements SystemAuthService {
     private TokenRedisDto issue(String userId, ClientType clientType) {
         try {
             String subject = SecureEncryptionUtil.encrypt(userId, authConfig.getJwtIdSecret());
-            Map<String, Object> claims = Map.of(
-                    "clientType", clientType.getValue(),
-                    "tokenType", TokenConstants.TOKEN_TYPE_ACCESS);
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("clientType", clientType.getValue());
+            claims.put("tokenType", TokenConstants.TOKEN_TYPE_ACCESS);
             String access = JWTUtil.generateToken(subject, required(authConfig.getJwtAccessTime()),
                     authConfig.getJwtAccessSecret(), claims);
+            Map<String, Object> refreshClaims = new HashMap<>();
+            refreshClaims.put("clientType", clientType.getValue());
+            refreshClaims.put("tokenType", TokenConstants.TOKEN_TYPE_REFRESH);
             String refresh = JWTUtil.generateToken(subject, required(authConfig.getJwtRefreshTime()),
-                    authConfig.getJwtRefreshSecret(), Map.<String, Object>of(
-                            "clientType", clientType.getValue(),
-                            "tokenType", TokenConstants.TOKEN_TYPE_REFRESH));
+                    authConfig.getJwtRefreshSecret(), refreshClaims);
             return new TokenRedisDto(access, refresh);
         } catch (Exception ex) {
             throw new IllegalStateException("令牌生成失败", ex);
