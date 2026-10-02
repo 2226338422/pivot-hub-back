@@ -44,7 +44,7 @@ public class SystemAuthServiceImpl implements SystemAuthService {
     private SysUserMapper userMapper;
 
     @Override
-    @Transactional(rollbackFor = Exception.class, noRollbackFor = DuplicateKeyException.class)
+    @Transactional(rollbackFor = Exception.class)
     public TokenVo loginByEmail(EmailLoginDto dto) {
         String email = normalizeEmail(dto.getEmail());
         ClientType clientType = ClientType.fromValue(dto.getClientType());
