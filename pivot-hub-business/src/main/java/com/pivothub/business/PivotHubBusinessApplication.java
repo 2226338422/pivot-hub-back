@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 )
 @EnableScheduling
 @EnableFeignClients(basePackages = "com.pivothub.common.feign")
-@MapperScan({"com.pivothub.common.mapper", "com.pivothub.business.mapper"})
+@MapperScan("com.pivothub.business.mapper")
 public class PivotHubBusinessApplication {
 
     public static void main(String[] args) {
