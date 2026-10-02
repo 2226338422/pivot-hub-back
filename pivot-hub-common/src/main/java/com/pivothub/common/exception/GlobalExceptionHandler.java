@@ -1,6 +1,7 @@
 package com.pivothub.common.exception;
 
 import com.pivothub.common.result.Result;
+import com.pivothub.commoncore.constants.auth.TokenConstants;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,12 @@ public class GlobalExceptionHandler {
 
     public static final String CLIENT_ERROR_PREFIX = "CLIENT_ERROR:";
     public static final String VALIDATION_ERROR_PREFIX = "VALIDATION_ERROR:";
+
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<Result<Object>> handleAuthException(AuthException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Result.error(TokenConstants.ACCESS_ERROR_CODE, ex.getMessage()));
+    }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Result<Object>> handleRuntimeException(RuntimeException ex) {

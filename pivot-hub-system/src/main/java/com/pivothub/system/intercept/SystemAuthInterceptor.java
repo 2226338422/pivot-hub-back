@@ -3,6 +3,7 @@ package com.pivothub.system.intercept;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.pivothub.commoncore.config.AuthConfig;
+import com.pivothub.common.exception.AuthException;
 import com.pivothub.common.util.TLUtil;
 import com.pivothub.commoncore.constants.auth.TokenConstants;
 import com.pivothub.commoncore.util.AuthHeaderUtil;
@@ -26,30 +27,31 @@ public class SystemAuthInterceptor implements HandlerInterceptor {
     private AuthSessionService authSessionService;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-            throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         TLUtil.remove(TLUtil.USER_ID);
+        String token = AuthHeaderUtil.extractBearerToken(request.getHeader(HttpHeaders.AUTHORIZATION));
+        if (token == null) {
+            throw new AuthException("请先登录");
+        }
+        String tokenUserId;
+        ClientType tokenClientType;
         try {
-            String token = AuthHeaderUtil.extractBearerToken(request.getHeader(HttpHeaders.AUTHORIZATION));
-            if (token == null) {
-                throw new IllegalArgumentException("请先登录");
-            }
             Claims claims = JWTUtil.parseToken(token, authConfig.getJwtAccessSecret());
-            if (!TokenConstants.TOKEN_TYPE_ACCESS.equals(String.valueOf(claims.get("tokenType")))) {
-                throw new IllegalArgumentException("访问令牌类型无效");
+            if (!TokenConstants.TOKEN_TYPE_ACCESS.equals(claims.get("tokenType", String.class))) {
+                throw new AuthException("访问令牌类型无效");
             }
-            String tokenUserId = SecureEncryptionUtil.decrypt(claims.getSubject(), authConfig.getJwtIdSecret());
-            ClientType tokenClientType = ClientType.fromValue(claims.get("clientType", Integer.class));
-            if (!authSessionService.verifyAccess(tokenUserId, tokenClientType, token)) {
-                throw new IllegalArgumentException("身份认证失败");
-            }
-            TLUtil.set(TLUtil.USER_ID, tokenUserId);
-            return true;
-        } catch (IllegalArgumentException ex) {
+            tokenUserId = SecureEncryptionUtil.decrypt(claims.getSubject(), authConfig.getJwtIdSecret());
+            tokenClientType = ClientType.fromValue(claims.get("clientType", Integer.class));
+        } catch (AuthException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new IllegalArgumentException("身份认证失败", ex);
+            throw new AuthException("身份认证失败", ex);
         }
+        if (!authSessionService.verifyAccess(tokenUserId, tokenClientType, token)) {
+            throw new AuthException("身份认证失败");
+        }
+        TLUtil.set(TLUtil.USER_ID, tokenUserId);
+        return true;
     }
 
     @Override

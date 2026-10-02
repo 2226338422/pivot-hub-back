@@ -3,6 +3,7 @@ package com.pivothub.system.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.pivothub.common.exception.AuthException;
 import com.pivothub.commoncore.config.AuthConfig;
 import com.pivothub.commoncore.constants.auth.TokenConstants;
 import com.pivothub.commoncore.util.JWTUtil;
@@ -19,6 +20,7 @@ import com.pivothub.system.mapper.SysUserMapper;
 import com.pivothub.system.service.MailCodeService;
 import com.pivothub.system.service.UserProfileService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,21 +64,35 @@ public class SystemAuthServiceImpl implements SystemAuthService {
 
     @Override
     public TokenVo refresh(TokenDto dto) {
-        Claims claims = JWTUtil.parseToken(dto.getRefreshToken(), authConfig.getJwtRefreshSecret());
-        requireTokenType(claims, TokenConstants.TOKEN_TYPE_REFRESH);
-        String userId = decryptUserId(claims.getSubject());
-        ClientType clientType = ClientType.fromValue(claims.get("clientType", Integer.class));
+        String userId;
+        ClientType clientType;
+        try {
+            Claims claims = JWTUtil.parseToken(dto.getRefreshToken(), authConfig.getJwtRefreshSecret());
+            requireTokenType(claims, TokenConstants.TOKEN_TYPE_REFRESH);
+            if (claims.getExpiration() == null) {
+                throw new AuthException("刷新令牌有效期无效");
+            }
+            userId = decryptUserId(claims.getSubject());
+            if (!StringUtils.hasText(userId)) {
+                throw new AuthException("令牌中的用户信息无效");
+            }
+            clientType = ClientType.fromValue(claims.get("clientType", Integer.class));
+        } catch (JwtException | IllegalArgumentException | IllegalStateException ex) {
+            throw new AuthException("刷新令牌无效或已过期", ex);
+        }
         if (!authSessionService.verifyRefresh(userId, clientType, dto.getRefreshToken())) {
-            throw new IllegalArgumentException("登录已过期");
+            throw new AuthException("登录已过期");
         }
         SysUser user = userProfileService.getUser(userId);
         if (user == null) {
-            throw new IllegalArgumentException("用户不存在");
+            throw new AuthException("用户不存在");
         }
-        assertEnabled(user);
+        if (user.getStatus() != null && user.getStatus() != 1) {
+            throw new AuthException("用户已禁用");
+        }
         TokenRedisDto pair = issue(userId, clientType);
         if (!authSessionService.rotateRefresh(userId, clientType, dto.getRefreshToken(), pair, user)) {
-            throw new IllegalArgumentException("刷新令牌已失效");
+            throw new AuthException("刷新令牌已失效");
         }
         userProfileService.refreshCache(userId);
         return toVo(pair, clientType);
@@ -133,13 +149,13 @@ public class SystemAuthServiceImpl implements SystemAuthService {
         try {
             return SecureEncryptionUtil.decrypt(subject, authConfig.getJwtIdSecret());
         } catch (Exception ex) {
-            throw new IllegalArgumentException("令牌中的用户信息无效", ex);
+            throw new AuthException("令牌中的用户信息无效", ex);
         }
     }
 
     private void requireTokenType(Claims claims, String expected) {
         if (claims == null || !expected.equals(String.valueOf(claims.get("tokenType")))) {
-            throw new IllegalArgumentException("令牌类型无效");
+            throw new AuthException("令牌类型无效");
         }
     }
 

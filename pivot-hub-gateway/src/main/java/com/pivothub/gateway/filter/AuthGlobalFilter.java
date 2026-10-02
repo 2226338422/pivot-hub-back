@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSON;
 import com.pivothub.commoncore.config.AuthConfig;
 import com.pivothub.commoncore.constants.auth.TokenConstants;
 import com.pivothub.commoncore.enums.ClientType;
+import com.pivothub.commoncore.util.AuthHeaderUtil;
 import com.pivothub.commoncore.util.JWTUtil;
 import com.pivothub.commoncore.util.SecureEncryptionUtil;
 import io.jsonwebtoken.Claims;
@@ -58,25 +59,25 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
             return chain.filter(exchange);
         }
 
-        String authorization = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        if (StringUtils.isBlank(authorization)) {
-            return errorResponse(exchange.getResponse(), "身份认证失败");
+        String token = AuthHeaderUtil.extractBearerToken(request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
+        if (token == null) {
+            return errorResponse(exchange.getResponse(), TokenConstants.ACCESS_ERROR_CODE, "请先登录");
         }
         try {
-            Claims claims = JWTUtil.parseToken(authorization, authConfig.getJwtAccessSecret());
-            if (!TokenConstants.TOKEN_TYPE_ACCESS.equals(String.valueOf(claims.get("tokenType")))) {
-                return errorResponse(exchange.getResponse(), "身份认证失败");
+            Claims claims = JWTUtil.parseToken(token, authConfig.getJwtAccessSecret());
+            if (!TokenConstants.TOKEN_TYPE_ACCESS.equals(claims.get("tokenType", String.class))) {
+                return errorResponse(exchange.getResponse(), TokenConstants.ACCESS_REFRESH_CODE, "访问令牌类型无效");
             }
             String userId = SecureEncryptionUtil.decrypt(claims.getSubject(), authConfig.getJwtIdSecret());
             ClientType.fromValue(claims.get("clientType", Integer.class));
             if (StringUtils.isBlank(userId)) {
-                return errorResponse(exchange.getResponse(), "身份认证失败");
+                return errorResponse(exchange.getResponse(), TokenConstants.ACCESS_REFRESH_CODE, "令牌中的用户信息无效");
             }
-            return chain.filter(exchange);
         } catch (Exception ex) {
             log.debug("网关拒绝访问令牌，请求路径：{}", path);
-            return errorResponse(exchange.getResponse(), "身份认证失败");
+            return errorResponse(exchange.getResponse(), TokenConstants.ACCESS_REFRESH_CODE, "访问令牌校验失败");
         }
+        return chain.filter(exchange);
     }
 
     boolean isExemptPath(String path) {
@@ -100,11 +101,11 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
         return path == null ? "" : path;
     }
 
-    private Mono<Void> errorResponse(ServerHttpResponse response, String message) {
+    private Mono<Void> errorResponse(ServerHttpResponse response, Integer code, String message) {
         response.setStatusCode(HttpStatus.UNAUTHORIZED);
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
         Map<String, Object> body = new HashMap<>();
-        body.put("code", HttpStatus.UNAUTHORIZED.value());
+        body.put("code", code);
         body.put("msg", message);
         body.put("data", null);
         DataBuffer buffer = response.bufferFactory()
