@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pivothub.system.mapper.SysMenuMapper">
+    <resultMap id="SysMenuResultMap" type="com.pivothub.pojo.po.system.SysMenu">
+        <id column="uuid" property="uuid"/>
+        <result column="code" property="code"/>
+        <result column="menu_name" property="menuName"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="module_id" property="moduleId"/>
+        <result column="web_url" property="webUrl"/>
+        <result column="app_url" property="appUrl"/>
+        <result column="icon" property="icon"/>
+        <result column="sort" property="sort"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <select id="selectUserMenus" resultMap="SysMenuResultMap">
+        SELECT DISTINCT m.uuid, m.code, m.menu_name, m.parent_id, m.module_id,
+                        m.web_url, m.app_url, m.icon, m.sort, m.status
+        FROM sys_user u
+        INNER JOIN sys_permission p ON p.status = 1 AND (
+            (p.person_type = 2 AND p.user_id = u.uuid)
+            OR (p.person_type = 1 AND p.role_id = u.role_id
+                AND EXISTS (
+                    SELECT 1 FROM sys_role r
+                    WHERE r.uuid = u.role_id AND r.status = 1
+                ))
+        )
+        INNER JOIN sys_menu m ON m.uuid = p.menu_id AND m.status = 1
+        WHERE u.uuid = #{userId} AND u.status = 1
+        ORDER BY m.sort ASC, m.uuid ASC
+    </select>
+</mapper>
