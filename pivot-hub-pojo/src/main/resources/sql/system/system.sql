@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS sys_role (
     name           VARCHAR(64)  NOT NULL COMMENT '角色名称',
     defa           TINYINT      NOT NULL DEFAULT 0 COMMENT '是否默认角色 0-否 1-是',
     sort           INT          NOT NULL DEFAULT 0 COMMENT '排序',
-    status         TINYINT      NOT NULL DEFAULT 1 COMMENT '状态 0-禁用 1-正常',
+    status         TINYINT      NOT NULL DEFAULT 1 COMMENT '状态 0-已删除 1-正常',
     remark         VARCHAR(500) NULL COMMENT '备注',
     create_user_id VARCHAR(32)  NULL COMMENT '创建人uuid',
     update_user_id VARCHAR(32)  NULL COMMENT '更新人uuid',
