@@ -29,7 +29,7 @@ public class SysRole extends BasePo {
     /** 排序 */
     private Integer sort;
 
-    /** 状态 0-禁用 1-正常 */
+    /** 状态 0-已删除 1-正常 */
     private Integer status;
 
     /** 备注 */

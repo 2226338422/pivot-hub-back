@@ -32,4 +32,22 @@
         WHERE u.uuid = #{userId} AND u.status = 1
         ORDER BY m.sort ASC, m.uuid ASC
     </select>
+    <select id="selectAllMenus" resultMap="SysMenuResultMap">
+        SELECT uuid, code, menu_name, parent_id, module_id, web_url, app_url, icon, sort, status
+        FROM sys_menu ORDER BY sort ASC, uuid ASC
+    </select>
+    <select id="selectAllMenusForUpdate" resultMap="SysMenuResultMap">
+        SELECT uuid, code, menu_name, parent_id, module_id, web_url, app_url, icon, sort, status
+        FROM sys_menu ORDER BY sort ASC, uuid ASC FOR UPDATE
+    </select>
+    <select id="countUserMenuAccess" resultType="int">
+        SELECT COUNT(*)
+        FROM sys_user u
+        INNER JOIN sys_menu m ON m.code = #{menuCode} AND m.status = 1
+        INNER JOIN sys_permission p ON p.menu_id = m.uuid AND p.status = 1
+        WHERE u.uuid = #{userId} AND u.status = 1
+          AND ((p.person_type = 2 AND p.user_id = u.uuid)
+            OR (p.person_type = 1 AND p.role_id = u.role_id
+                AND EXISTS (SELECT 1 FROM sys_role r WHERE r.uuid = u.role_id AND r.status = 1)))
+    </select>
 </mapper>

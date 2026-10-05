@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pivothub.system.mapper.SysRoleMapper">
+    <resultMap id="RoleMap" type="com.pivothub.pojo.po.system.SysRole">
+        <id column="uuid" property="uuid"/>
+        <result column="code" property="code"/>
+        <result column="name" property="name"/>
+        <result column="defa" property="defa"/>
+        <result column="sort" property="sort"/>
+        <result column="status" property="status"/>
+        <result column="remark" property="remark"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="update_user_id" property="updateUserId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+    <sql id="columns">
+        uuid, code, name, defa, sort, status, remark,
+        create_user_id, update_user_id, create_time, update_time
+    </sql>
+    <select id="selectPage" resultMap="RoleMap">
+        SELECT <include refid="columns"/> FROM sys_role WHERE status = 1
+        <if test="name != null and name != ''">
+            AND name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        <if test="code != null and code != ''">
+            AND code LIKE CONCAT('%', #{code}, '%')
+        </if>
+        ORDER BY sort ASC, uuid ASC
+    </select>
+    <select id="selectLiveById" resultMap="RoleMap">
+        SELECT <include refid="columns"/> FROM sys_role WHERE uuid = #{roleId} AND status = 1
+    </select>
+    <select id="selectByIdForUpdate" resultMap="RoleMap">
+        SELECT <include refid="columns"/> FROM sys_role WHERE uuid = #{roleId} FOR UPDATE
+    </select>
+    <select id="selectRoleIdsForUpdate" resultType="string">
+        SELECT uuid FROM sys_role ORDER BY uuid ASC FOR UPDATE
+    </select>
+    <update id="clearDefaultRoles">
+        UPDATE sys_role SET defa = 0, update_user_id = #{operatorId}, update_time = NOW()
+        WHERE defa != 0
+    </update>
+    <select id="countByCode" resultType="int">
+        SELECT COUNT(*) FROM sys_role WHERE code = #{code}
+    </select>
+    <select id="countUserReferences" resultType="long">
+        SELECT COUNT(*) FROM sys_user WHERE role_id = #{roleId}
+    </select>
+    <insert id="insertRole">
+        INSERT INTO sys_role
+            (uuid, code, name, defa, sort, status, remark, create_user_id, update_user_id, create_time, update_time)
+        VALUES (#{uuid}, #{code}, #{name}, #{defa}, #{sort}, #{status}, #{remark},
+                #{createUserId}, #{updateUserId}, #{createTime}, #{updateTime})
+    </insert>
+    <update id="updateRole">
+        UPDATE sys_role SET name = #{name}, defa = #{defa}, sort = #{sort}, remark = #{remark},
+            update_user_id = #{updateUserId}, update_time = #{updateTime}
+        WHERE uuid = #{uuid} AND status = 1
+    </update>
+    <update id="markDeleted">
+        UPDATE sys_role SET status = 0, update_user_id = #{operatorId}, update_time = NOW()
+        WHERE uuid = #{roleId} AND status = 1
+    </update>
+</mapper>

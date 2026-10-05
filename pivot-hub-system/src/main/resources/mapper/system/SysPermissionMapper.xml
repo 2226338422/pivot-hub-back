@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pivothub.system.mapper.SysPermissionMapper">
+    <resultMap id="PermissionMap" type="com.pivothub.pojo.po.system.SysPermission">
+        <id column="uuid" property="uuid"/>
+        <result column="name" property="name"/>
+        <result column="menu_id" property="menuId"/>
+        <result column="role_id" property="roleId"/>
+        <result column="user_id" property="userId"/>
+        <result column="person_type" property="personType"/>
+        <result column="status" property="status"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="update_user_id" property="updateUserId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+    <select id="selectRolePermissions" resultMap="PermissionMap">
+        SELECT uuid, name, menu_id, role_id, user_id, person_type, status,
+               create_user_id, update_user_id, create_time, update_time
+        FROM sys_permission WHERE person_type = 1 AND role_id = #{roleId}
+        ORDER BY uuid ASC FOR UPDATE
+    </select>
+    <select id="selectActiveRoleMenuIds" resultType="string">
+        SELECT DISTINCT p.menu_id
+        FROM sys_permission p INNER JOIN sys_menu m ON m.uuid = p.menu_id
+        WHERE p.person_type = 1 AND p.role_id = #{roleId} AND p.status = 1
+        ORDER BY p.menu_id ASC
+    </select>
+    <update id="disableRolePermissions">
+        UPDATE sys_permission SET status = 0, update_user_id = #{operatorId}, update_time = NOW()
+        WHERE person_type = 1 AND role_id = #{roleId}
+    </update>
+    <update id="activatePermission">
+        UPDATE sys_permission SET status = 1, update_user_id = #{operatorId}, update_time = NOW()
+        WHERE uuid = #{permissionId} AND role_id = #{roleId} AND person_type = 1
+    </update>
+    <insert id="insertPermission">
+        INSERT INTO sys_permission
+            (uuid, name, menu_id, role_id, user_id, person_type, status,
+             create_user_id, update_user_id, create_time, update_time)
+        VALUES (#{uuid}, #{name}, #{menuId}, #{roleId}, #{userId}, #{personType}, #{status},
+                #{createUserId}, #{updateUserId}, #{createTime}, #{updateTime})
+    </insert>
+</mapper>
