@@ -32,6 +32,18 @@ public class GlobalExceptionHandler {
                 .body(Result.error(TokenConstants.ACCESS_ERROR_CODE, ex.getMessage()));
     }
 
+    @ExceptionHandler(SystemException.class)
+    public ResponseEntity<Result<Object>> handleSystemException(SystemException ex) {
+        return ResponseEntity.status(ex.getHttpStatus())
+                .body(Result.error(ex.getHttpStatus(), ex.getMessage()));
+    }
+
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<Result<Object>> handleBusinessException(BusinessException ex) {
+        return ResponseEntity.status(ex.getHttpStatus())
+                .body(Result.error(ex.getHttpStatus(), ex.getMessage()));
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Result<Object>> handleRuntimeException(RuntimeException ex) {
         ex.printStackTrace();
