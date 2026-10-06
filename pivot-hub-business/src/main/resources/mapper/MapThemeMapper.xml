@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pivothub.business.map.mapper.MapThemeMapper">
+    <resultMap id="RecordMap" type="com.pivothub.pojo.po.business.map.MapTheme">
+        <id column="uuid" property="uuid"/>
+        <result column="owner_user_id" property="ownerUserId"/>
+        <result column="name" property="name"/>
+        <result column="description" property="description"/>
+        <result column="center_longitude" property="centerLongitude"/>
+        <result column="center_latitude" property="centerLatitude"/>
+        <result column="default_zoom" property="defaultZoom"/>
+        <result column="sort" property="sort"/>
+        <result column="status" property="status"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="update_user_id" property="updateUserId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+    <sql id="columns">uuid, owner_user_id, name, description, center_longitude, center_latitude, default_zoom, sort, status, create_user_id, update_user_id, create_time, update_time</sql>
+    <select id="selectById" resultMap="RecordMap">
+        SELECT <include refid="columns"/> FROM map_theme WHERE owner_user_id = #{owner} AND uuid = #{id}
+    </select>
+    <select id="selectByIdForUpdate" resultMap="RecordMap">
+        SELECT <include refid="columns"/> FROM map_theme WHERE owner_user_id = #{owner} AND uuid = #{id} FOR UPDATE
+    </select>
+    <insert id="insert">
+        INSERT INTO map_theme (uuid, owner_user_id, name, description, center_longitude, center_latitude, default_zoom, sort, status, create_user_id, update_user_id, create_time, update_time) VALUES (#{uuid}, #{ownerUserId}, #{name}, #{description}, #{centerLongitude}, #{centerLatitude}, #{defaultZoom}, #{sort}, #{status}, #{createUserId}, #{updateUserId}, #{createTime}, #{updateTime})
+    </insert>
+    <update id="update">
+        UPDATE map_theme SET name = #{name}, description = #{description}, center_longitude = #{centerLongitude}, center_latitude = #{centerLatitude}, default_zoom = #{defaultZoom}, sort = #{sort}, update_user_id = #{updateUserId}, update_time = #{updateTime}
+        WHERE owner_user_id = #{ownerUserId} AND uuid = #{uuid} AND status = 1
+    </update>
+    <update id="markDeleted">
+        UPDATE map_theme SET status = 0, update_user_id = #{owner}, update_time = NOW()
+        WHERE owner_user_id = #{owner} AND uuid = #{id} AND status = 1
+    </update>
+    <select id="selectList" resultMap="RecordMap">
+        SELECT <include refid="columns"/> FROM map_theme WHERE owner_user_id = #{owner} AND status = 1
+        ORDER BY sort ASC, uuid ASC
+    </select>
+</mapper>

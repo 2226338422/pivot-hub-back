@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pivothub.business.map.mapper.MapPointMapper">
+    <resultMap id="RecordMap" type="com.pivothub.pojo.po.business.map.MapPoint">
+        <id column="uuid" property="uuid"/>
+        <result column="owner_user_id" property="ownerUserId"/>
+        <result column="theme_id" property="themeId"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="name" property="name"/>
+        <result column="address" property="address"/>
+        <result column="longitude" property="longitude"/>
+        <result column="latitude" property="latitude"/>
+        <result column="note" property="note"/>
+        <result column="source" property="source"/>
+        <result column="amap_poi_id" property="amapPoiId"/>
+        <result column="status" property="status"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="update_user_id" property="updateUserId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+    <sql id="columns">uuid, owner_user_id, theme_id, category_id, name, address, longitude, latitude, note, source, amap_poi_id, status, create_user_id, update_user_id, create_time, update_time</sql>
+    <select id="selectById" resultMap="RecordMap">
+        SELECT <include refid="columns"/> FROM map_point WHERE owner_user_id = #{owner} AND uuid = #{id}
+    </select>
+    <select id="selectByIdForUpdate" resultMap="RecordMap">
+        SELECT <include refid="columns"/> FROM map_point WHERE owner_user_id = #{owner} AND uuid = #{id} FOR UPDATE
+    </select>
+    <insert id="insert">
+        INSERT INTO map_point (uuid, owner_user_id, theme_id, category_id, name, address, longitude, latitude, note, source, amap_poi_id, status, create_user_id, update_user_id, create_time, update_time) VALUES (#{uuid}, #{ownerUserId}, #{themeId}, #{categoryId}, #{name}, #{address}, #{longitude}, #{latitude}, #{note}, #{source}, #{amapPoiId}, #{status}, #{createUserId}, #{updateUserId}, #{createTime}, #{updateTime})
+    </insert>
+    <update id="update">
+        UPDATE map_point SET category_id = #{categoryId}, name = #{name}, address = #{address}, longitude = #{longitude}, latitude = #{latitude}, note = #{note}, update_user_id = #{updateUserId}, update_time = #{updateTime}
+        WHERE owner_user_id = #{ownerUserId} AND uuid = #{uuid} AND status = 1
+    </update>
+    <update id="markDeleted">
+        UPDATE map_point SET status = 0, update_user_id = #{owner}, update_time = NOW()
+        WHERE owner_user_id = #{owner} AND uuid = #{id} AND status = 1
+    </update>
+    <update id="deleteByTheme">
+        UPDATE map_point SET status = 0, update_user_id = #{owner}, update_time = NOW()
+        WHERE owner_user_id = #{owner} AND theme_id = #{themeId} AND status = 1
+    </update>
+    <resultMap id="SummaryMap" type="com.pivothub.pojo.vo.business.map.MapPointSummaryVo">
+        <id column="uuid" property="uuid"/>
+        <result column="theme_id" property="themeId"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="name" property="name"/>
+        <result column="address" property="address"/>
+        <result column="longitude" property="longitude"/>
+        <result column="latitude" property="latitude"/>
+        <result column="source" property="source"/>
+        <result column="amap_poi_id" property="amapPoiId"/>
+        <result column="icon_id" property="iconId"/>
+    </resultMap>
+    <resultMap id="DetailMap" type="com.pivothub.pojo.vo.business.map.MapPointVo">
+        <id column="uuid" property="uuid"/>
+        <result column="theme_id" property="themeId"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="name" property="name"/>
+        <result column="address" property="address"/>
+        <result column="longitude" property="longitude"/>
+        <result column="latitude" property="latitude"/>
+        <result column="source" property="source"/>
+        <result column="amap_poi_id" property="amapPoiId"/>
+        <result column="note" property="note"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="icon_id" property="iconId"/>
+    </resultMap>
+    <sql id="summaryColumns">p.uuid, p.theme_id, p.category_id, p.name, p.address, p.longitude, p.latitude, p.source, p.amap_poi_id, c.icon_id</sql>
+    <sql id="categoryJoin">
+        LEFT JOIN map_category c ON c.uuid = p.category_id AND c.owner_user_id = p.owner_user_id AND c.theme_id = p.theme_id AND c.status = 1
+    </sql>
+    <sql id="summaryFilter">
+        WHERE p.owner_user_id = #{owner} AND p.theme_id = #{query.themeId} AND p.status = 1
+        <if test="query.keyword != null and query.keyword != ''">AND p.name LIKE CONCAT('%', #{query.keyword}, '%') ESCAPE '!'</if>
+        <if test="query.categoryId != null and query.categoryId != ''">AND p.category_id = #{query.categoryId}</if>
+        <if test="query.uncategorized != null and query.uncategorized">AND p.category_id IS NULL</if>
+    </sql>
+    <select id="selectSummaries" resultMap="SummaryMap">
+        SELECT <include refid="summaryColumns"/> FROM map_point p <include refid="categoryJoin"/>
+        <include refid="summaryFilter"/> ORDER BY p.uuid ASC
+    </select>
+    <select id="selectMarkers" resultMap="SummaryMap">
+        SELECT <include refid="summaryColumns"/> FROM map_point p <include refid="categoryJoin"/>
+        <include refid="summaryFilter"/> ORDER BY p.uuid ASC LIMIT 5000
+    </select>
+    <select id="selectDetail" resultMap="DetailMap">
+        SELECT <include refid="summaryColumns"/>, p.note, p.create_time, p.update_time
+        FROM map_point p <include refid="categoryJoin"/> WHERE p.owner_user_id = #{owner} AND p.uuid = #{id} AND p.status = 1
+    </select>
+    <select id="countThemePoints" resultType="long">
+        SELECT COUNT(*) FROM map_point WHERE owner_user_id = #{owner} AND theme_id = #{themeId} AND status = 1
+    </select>
+    <select id="countCategoryReferences" resultType="long">
+        SELECT COUNT(*) FROM map_point WHERE owner_user_id = #{owner} AND theme_id = #{themeId} AND category_id = #{categoryId} AND status = 1
+    </select>
+    <select id="findPoiId" resultType="string">
+        SELECT uuid FROM map_point WHERE owner_user_id = #{owner} AND theme_id = #{themeId} AND amap_poi_id = #{poiId} AND status = 1 ORDER BY uuid ASC LIMIT 1
+    </select>
+</mapper>

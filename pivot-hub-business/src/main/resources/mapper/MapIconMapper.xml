@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pivothub.business.map.mapper.MapIconMapper">
+    <resultMap id="RecordMap" type="com.pivothub.pojo.po.business.map.MapIcon">
+        <id column="uuid" property="uuid"/>
+        <result column="owner_user_id" property="ownerUserId"/>
+        <result column="name" property="name"/>
+        <result column="object_key" property="objectKey"/>
+        <result column="mime_type" property="mimeType"/>
+        <result column="file_size" property="fileSize"/>
+        <result column="width" property="width"/>
+        <result column="height" property="height"/>
+        <result column="anchor" property="anchor"/>
+        <result column="status" property="status"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="update_user_id" property="updateUserId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+    <sql id="columns">uuid, owner_user_id, name, object_key, mime_type, file_size, width, height, anchor, status, create_user_id, update_user_id, create_time, update_time</sql>
+    <select id="selectById" resultMap="RecordMap">
+        SELECT <include refid="columns"/> FROM map_icon WHERE owner_user_id = #{owner} AND uuid = #{id}
+    </select>
+    <select id="selectByIdForUpdate" resultMap="RecordMap">
+        SELECT <include refid="columns"/> FROM map_icon WHERE owner_user_id = #{owner} AND uuid = #{id} FOR UPDATE
+    </select>
+    <insert id="insert">
+        INSERT INTO map_icon (uuid, owner_user_id, name, object_key, mime_type, file_size, width, height, anchor, status, create_user_id, update_user_id, create_time, update_time) VALUES (#{uuid}, #{ownerUserId}, #{name}, #{objectKey}, #{mimeType}, #{fileSize}, #{width}, #{height}, #{anchor}, #{status}, #{createUserId}, #{updateUserId}, #{createTime}, #{updateTime})
+    </insert>
+    <update id="update">
+        UPDATE map_icon SET name = #{name}, width = #{width}, height = #{height}, update_user_id = #{updateUserId}, update_time = #{updateTime}
+        WHERE owner_user_id = #{ownerUserId} AND uuid = #{uuid} AND status = 1
+    </update>
+    <update id="markDeleted">
+        UPDATE map_icon SET status = 0, update_user_id = #{owner}, update_time = NOW()
+        WHERE owner_user_id = #{owner} AND uuid = #{id} AND status = 1
+    </update>
+    <select id="selectList" resultMap="RecordMap">
+        SELECT <include refid="columns"/> FROM map_icon WHERE owner_user_id = #{owner} AND status = 1
+        <if test="keyword != null and keyword != ''">AND name LIKE CONCAT('%', #{keyword}, '%') ESCAPE '!'</if>
+        ORDER BY uuid ASC
+    </select>
+</mapper>

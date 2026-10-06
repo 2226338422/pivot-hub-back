@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pivothub.business.map.mapper.MapCategoryMapper">
+    <resultMap id="RecordMap" type="com.pivothub.pojo.po.business.map.MapCategory">
+        <id column="uuid" property="uuid"/>
+        <result column="owner_user_id" property="ownerUserId"/>
+        <result column="theme_id" property="themeId"/>
+        <result column="name" property="name"/>
+        <result column="icon_id" property="iconId"/>
+        <result column="sort" property="sort"/>
+        <result column="status" property="status"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="update_user_id" property="updateUserId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+    <sql id="columns">uuid, owner_user_id, theme_id, name, icon_id, sort, status, create_user_id, update_user_id, create_time, update_time</sql>
+    <select id="selectById" resultMap="RecordMap">
+        SELECT <include refid="columns"/> FROM map_category WHERE owner_user_id = #{owner} AND uuid = #{id}
+    </select>
+    <select id="selectByIdForUpdate" resultMap="RecordMap">
+        SELECT <include refid="columns"/> FROM map_category WHERE owner_user_id = #{owner} AND uuid = #{id} FOR UPDATE
+    </select>
+    <insert id="insert">
+        INSERT INTO map_category (uuid, owner_user_id, theme_id, name, icon_id, sort, status, create_user_id, update_user_id, create_time, update_time) VALUES (#{uuid}, #{ownerUserId}, #{themeId}, #{name}, #{iconId}, #{sort}, #{status}, #{createUserId}, #{updateUserId}, #{createTime}, #{updateTime})
+    </insert>
+    <update id="update">
+        UPDATE map_category SET name = #{name}, icon_id = #{iconId}, sort = #{sort}, update_user_id = #{updateUserId}, update_time = #{updateTime}
+        WHERE owner_user_id = #{ownerUserId} AND uuid = #{uuid} AND status = 1
+    </update>
+    <update id="markDeleted">
+        UPDATE map_category SET status = 0, update_user_id = #{owner}, update_time = NOW()
+        WHERE owner_user_id = #{owner} AND uuid = #{id} AND status = 1
+    </update>
+    <select id="selectList" resultMap="RecordMap">
+        SELECT <include refid="columns"/> FROM map_category WHERE owner_user_id = #{owner} AND status = 1
+        AND theme_id = #{themeId}
+        ORDER BY sort ASC, uuid ASC
+    </select>
+    <select id="countName" resultType="long">
+        SELECT COUNT(*) FROM map_category WHERE owner_user_id = #{owner} AND theme_id = #{themeId} AND status = 1 AND name = #{name}
+        <if test="excludeId != null">AND uuid != #{excludeId}</if>
+    </select>
+    <select id="countIconReferences" resultType="long">
+        SELECT COUNT(*) FROM map_category WHERE owner_user_id = #{owner} AND icon_id = #{iconId} AND status = 1
+    </select>
+    <update id="deleteByTheme">
+        UPDATE map_category SET status = 0, update_user_id = #{owner}, update_time = NOW()
+        WHERE owner_user_id = #{owner} AND theme_id = #{themeId} AND status = 1
+    </update>
+</mapper>
