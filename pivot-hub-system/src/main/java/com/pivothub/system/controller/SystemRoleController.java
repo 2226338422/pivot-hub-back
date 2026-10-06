@@ -1,5 +1,7 @@
 package com.pivothub.system.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.pivothub.common.result.Result;
 import com.pivothub.common.util.TLUtil;
 import com.pivothub.pojo.dto.system.*;
@@ -9,7 +11,6 @@ import com.pivothub.system.annotation.MenuPermission;
 import com.pivothub.system.service.RoleManagementService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -18,9 +19,9 @@ import static com.pivothub.commoncore.constants.system.RoleManagementConstants.M
 @RestController
 @RequestMapping("/system/role")
 @MenuPermission(MANAGEMENT_MENU_CODE)
-@RequiredArgsConstructor
 public class SystemRoleController {
-    private final RoleManagementService roleService;
+    @Autowired
+    private RoleManagementService roleService;
 
     @Operation(summary = "分页查询正常角色")
     @GetMapping("/page")

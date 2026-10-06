@@ -1,5 +1,7 @@
 package com.pivothub.system.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -11,7 +13,6 @@ import com.pivothub.pojo.vo.system.RoleVo;
 import com.pivothub.system.mapper.*;
 import com.pivothub.system.service.MenuManagementService;
 import com.pivothub.system.service.RoleManagementService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -21,13 +22,17 @@ import java.util.*;
 import static com.pivothub.commoncore.constants.system.RoleManagementConstants.*;
 
 @Service
-@RequiredArgsConstructor
 public class RoleManagementServiceImpl implements RoleManagementService {
-    private final MenuManagementService menuService;
-    private final SysRoleMapper roleMapper;
-    private final SysPermissionMapper permissionMapper;
-    private final SysMenuMapper menuMapper;
-    private final SysUserMapper userMapper;
+    @Autowired
+    private MenuManagementService menuService;
+    @Autowired
+    private SysRoleMapper roleMapper;
+    @Autowired
+    private SysPermissionMapper permissionMapper;
+    @Autowired
+    private SysMenuMapper menuMapper;
+    @Autowired
+    private SysUserMapper userMapper;
 
     @Override
     public PageVo<RoleVo> page(String operatorId, RolePageDto query) {

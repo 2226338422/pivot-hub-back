@@ -1,11 +1,12 @@
 package com.pivothub.system.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.pivothub.common.exception.SystemException;
 import com.pivothub.pojo.po.system.SysMenu;
 import com.pivothub.pojo.vo.system.MenuTreeVo;
 import com.pivothub.system.mapper.SysMenuMapper;
 import com.pivothub.system.service.MenuManagementService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -13,9 +14,9 @@ import java.util.*;
 import static com.pivothub.commoncore.constants.system.RoleManagementConstants.*;
 
 @Service
-@RequiredArgsConstructor
 public class MenuManagementServiceImpl implements MenuManagementService {
-    private final SysMenuMapper menuMapper;
+    @Autowired
+    private SysMenuMapper menuMapper;
 
     @Override
     public List<MenuTreeVo> getAllMenuTree(String operatorId) {
