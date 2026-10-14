@@ -10,7 +10,7 @@ import com.pivothub.business.map.utils.AmapHttpClient;
 import com.pivothub.common.util.TLUtil;
 import com.pivothub.common.exception.BusinessException;
 import com.pivothub.commoncore.constants.map.MapConstants;
-import com.pivothub.commoncore.util.MapProxyPathUtil;
+import com.pivothub.business.map.utils.MapProxyPathUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
