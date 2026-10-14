@@ -1,12 +1,13 @@
 package com.pivothub.system.aspect;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.pivothub.common.exception.SystemException;
 import com.pivothub.common.util.TLUtil;
 import com.pivothub.pojo.po.system.SysUser;
 import com.pivothub.system.annotation.MenuPermission;
 import com.pivothub.system.mapper.SysMenuMapper;
 import com.pivothub.system.mapper.SysUserMapper;
-import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -27,10 +28,11 @@ import static com.pivothub.commoncore.constants.system.RoleManagementConstants.E
 @Aspect
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 100)
-@RequiredArgsConstructor
 public class MenuPermissionAspect {
-    private final SysMenuMapper menuMapper;
-    private final SysUserMapper userMapper;
+    @Autowired
+    private SysMenuMapper menuMapper;
+    @Autowired
+    private SysUserMapper userMapper;
 
     @Around("execution(public * com.pivothub.system.controller..*(..)) && "
             + "(@within(com.pivothub.system.annotation.MenuPermission) "
