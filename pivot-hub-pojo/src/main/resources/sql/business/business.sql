@@ -108,3 +108,70 @@ CREATE TABLE IF NOT EXISTS community_post_favorite (
     UNIQUE KEY uk_community_post_favorite_post_user (post_id, user_id),
     KEY idx_community_post_favorite_user_id (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='社区帖子收藏表';
+
+CREATE TABLE IF NOT EXISTS map_theme (
+  uuid VARCHAR(32) NOT NULL PRIMARY KEY,
+  owner_user_id VARCHAR(32) NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  description VARCHAR(500) NULL,
+  center_longitude DECIMAL(10,6) NULL,
+  center_latitude DECIMAL(9,6) NULL,
+  default_zoom INT NOT NULL DEFAULT 14,
+  sort INT NOT NULL DEFAULT 0,
+  status TINYINT NOT NULL DEFAULT 1,
+  create_user_id VARCHAR(32) NULL, update_user_id VARCHAR(32) NULL,
+  create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+  update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_map_theme_owner_status_sort(owner_user_id,status,sort)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='私有地图主题';
+
+CREATE TABLE IF NOT EXISTS map_icon (
+  uuid VARCHAR(32) NOT NULL PRIMARY KEY,
+  owner_user_id VARCHAR(32) NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  object_key VARCHAR(512) NOT NULL,
+  mime_type VARCHAR(50) NOT NULL,
+  file_size BIGINT NOT NULL,
+  width INT NOT NULL DEFAULT 32, height INT NOT NULL DEFAULT 40,
+  anchor VARCHAR(32) NOT NULL DEFAULT 'bottom-center',
+  status TINYINT NOT NULL DEFAULT 1,
+  create_user_id VARCHAR(32) NULL, update_user_id VARCHAR(32) NULL,
+  create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+  update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_map_icon_owner_status(owner_user_id,status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户私有地图图标素材';
+
+CREATE TABLE IF NOT EXISTS map_category (
+  uuid VARCHAR(32) NOT NULL PRIMARY KEY,
+  owner_user_id VARCHAR(32) NOT NULL,
+  theme_id VARCHAR(32) NOT NULL,
+  name VARCHAR(64) NOT NULL,
+  icon_id VARCHAR(32) NULL,
+  sort INT NOT NULL DEFAULT 0,
+  status TINYINT NOT NULL DEFAULT 1,
+  create_user_id VARCHAR(32) NULL, update_user_id VARCHAR(32) NULL,
+  create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+  update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_map_category_theme_owner_status(theme_id,owner_user_id,status),
+  KEY idx_map_category_icon(icon_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='主题地点分类';
+
+CREATE TABLE IF NOT EXISTS map_point (
+  uuid VARCHAR(32) NOT NULL PRIMARY KEY,
+  owner_user_id VARCHAR(32) NOT NULL,
+  theme_id VARCHAR(32) NOT NULL,
+  category_id VARCHAR(32) NULL,
+  name VARCHAR(200) NOT NULL,
+  address VARCHAR(500) NULL,
+  longitude DECIMAL(10,6) NOT NULL, latitude DECIMAL(9,6) NOT NULL,
+  note TEXT NULL,
+  source TINYINT NOT NULL DEFAULT 0,
+  amap_poi_id VARCHAR(100) NULL,
+  status TINYINT NOT NULL DEFAULT 1,
+  create_user_id VARCHAR(32) NULL, update_user_id VARCHAR(32) NULL,
+  create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+  update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_map_point_theme_owner_status(theme_id,owner_user_id,status),
+  KEY idx_map_point_theme_category(theme_id,category_id,status),
+  KEY idx_map_point_amap_poi(theme_id,amap_poi_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='主题地点及文字笔记';
