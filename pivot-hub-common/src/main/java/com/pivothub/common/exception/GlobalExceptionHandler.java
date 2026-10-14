@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<Result<Object>> handleBusinessException(BusinessException ex) {
         return ResponseEntity.status(ex.getHttpStatus())
-                .body(Result.error(ex.getHttpStatus(), ex.getMessage()));
+                .body(new Result<>(ex.getData(), ex.getResultCode(), ex.getMessage()));
     }
 
     @ExceptionHandler(RuntimeException.class)
