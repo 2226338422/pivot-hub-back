@@ -27,18 +27,18 @@
         SELECT <include refid="columns"/> FROM map_point WHERE owner_user_id = #{owner} AND uuid = #{id} FOR UPDATE
     </select>
     <insert id="insert">
-        INSERT INTO map_point (uuid, owner_user_id, theme_id, category_id, name, address, longitude, latitude, note, source, amap_poi_id, status, create_user_id, update_user_id, create_time, update_time) VALUES (#{uuid}, #{ownerUserId}, #{themeId}, #{categoryId}, #{name}, #{address}, #{longitude}, #{latitude}, #{note}, #{source}, #{amapPoiId}, #{status}, #{createUserId}, #{updateUserId}, #{createTime}, #{updateTime})
+        INSERT INTO map_point (uuid, owner_user_id, theme_id, category_id, name, address, longitude, latitude, note, source, amap_poi_id, status, create_user_id, update_user_id) VALUES (#{uuid}, #{ownerUserId}, #{themeId}, #{categoryId}, #{name}, #{address}, #{longitude}, #{latitude}, #{note}, #{source}, #{amapPoiId}, #{status}, #{createUserId}, #{updateUserId})
     </insert>
     <update id="update">
-        UPDATE map_point SET category_id = #{categoryId}, name = #{name}, address = #{address}, longitude = #{longitude}, latitude = #{latitude}, note = #{note}, update_user_id = #{updateUserId}, update_time = #{updateTime}
+        UPDATE map_point SET category_id = #{categoryId}, name = #{name}, address = #{address}, longitude = #{longitude}, latitude = #{latitude}, note = #{note}, update_user_id = #{updateUserId}
         WHERE owner_user_id = #{ownerUserId} AND uuid = #{uuid} AND status = 1
     </update>
     <update id="markDeleted">
-        UPDATE map_point SET status = 0, update_user_id = #{owner}, update_time = NOW()
+        UPDATE map_point SET status = 0, update_user_id = #{owner}
         WHERE owner_user_id = #{owner} AND uuid = #{id} AND status = 1
     </update>
     <update id="deleteByTheme">
-        UPDATE map_point SET status = 0, update_user_id = #{owner}, update_time = NOW()
+        UPDATE map_point SET status = 0, update_user_id = #{owner}
         WHERE owner_user_id = #{owner} AND theme_id = #{themeId} AND status = 1
     </update>
     <resultMap id="SummaryMap" type="com.pivothub.pojo.vo.business.map.MapPointSummaryVo">
