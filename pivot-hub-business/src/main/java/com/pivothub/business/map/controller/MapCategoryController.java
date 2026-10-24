@@ -21,7 +21,7 @@ import java.util.List;
  * @CreateTime 2026/10/5
  */
 @RestController
-@MenuPermission("map")
+@MenuPermission("map_favorites")
 @RequestMapping("/business/map/category")
 public class MapCategoryController {
     @Autowired

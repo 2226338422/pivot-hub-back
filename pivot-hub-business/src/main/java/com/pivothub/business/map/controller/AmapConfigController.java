@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @CreateTime 2026/10/5
  */
 @RestController
-@MenuPermission("map")
+@MenuPermission("map_favorites")
 @RequestMapping("/business/map/amap")
 public class AmapConfigController {
     @Autowired
