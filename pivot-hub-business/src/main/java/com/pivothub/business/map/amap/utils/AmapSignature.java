@@ -1,4 +1,4 @@
-package com.pivothub.business.map.utils;
+package com.pivothub.business.map.amap.utils;
 
 import com.pivothub.common.exception.BusinessException;
 import java.nio.charset.StandardCharsets;

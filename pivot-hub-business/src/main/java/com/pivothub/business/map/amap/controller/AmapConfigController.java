@@ -1,15 +1,15 @@
-package com.pivothub.business.map.controller;
+package com.pivothub.business.map.amap.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.pivothub.business.annotation.MenuPermission;
 
-import com.pivothub.business.map.config.AmapProperties;
+import com.pivothub.business.map.amap.config.AmapProperties;
 import com.pivothub.common.exception.BusinessException;
 import com.pivothub.common.result.Result;
 import com.pivothub.commoncore.constants.map.MapConstants;
-import com.pivothub.pojo.vo.business.map.MapRuntimeConfigVo;
+import com.pivothub.pojo.vo.business.map.amap.MapRuntimeConfigVo;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @CreateTime 2026/10/5
  */
 @RestController
-@MenuPermission("map_favorites")
+@MenuPermission(anyOf = {"map_favorites", "map_typhoon"})
 @RequestMapping("/business/map/amap")
 public class AmapConfigController {
     @Autowired

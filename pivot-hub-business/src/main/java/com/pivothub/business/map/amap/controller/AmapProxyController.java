@@ -1,16 +1,16 @@
-package com.pivothub.business.map.controller;
+package com.pivothub.business.map.amap.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.pivothub.business.annotation.MenuPermission;
 
-import com.pivothub.business.map.service.AmapProxyService;
-import com.pivothub.business.map.utils.AmapHttpClient;
+import com.pivothub.business.map.amap.service.AmapProxyService;
+import com.pivothub.business.map.amap.utils.AmapHttpClient;
 import com.pivothub.common.util.TLUtil;
 import com.pivothub.common.exception.BusinessException;
 import com.pivothub.commoncore.constants.map.MapConstants;
-import com.pivothub.business.map.utils.MapProxyPathUtil;
+import com.pivothub.business.map.amap.utils.MapProxyPathUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @CreateTime 2026/10/5
  */
 @RestController
-@MenuPermission("map_favorites")
+@MenuPermission(anyOf = {"map_favorites", "map_typhoon"})
 @RequestMapping(MapConstants.SDK_PROXY_PREFIX)
 public class AmapProxyController {
     @Autowired

@@ -1,8 +1,8 @@
-package com.pivothub.business.map.utils;
+package com.pivothub.business.map.amap.utils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.pivothub.business.map.config.AmapProperties;
+import com.pivothub.business.map.amap.config.AmapProperties;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 import java.net.InetAddress;

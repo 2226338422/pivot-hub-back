@@ -1,8 +1,8 @@
-package com.pivothub.business.map.utils;
+package com.pivothub.business.map.amap.utils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.pivothub.business.map.config.AmapProperties;
+import com.pivothub.business.map.amap.config.AmapProperties;
 import com.pivothub.common.exception.BusinessException;
 import com.pivothub.commoncore.constants.redis.BusinessRedisConstants;
 import com.pivothub.commoncore.util.CacheUtil;

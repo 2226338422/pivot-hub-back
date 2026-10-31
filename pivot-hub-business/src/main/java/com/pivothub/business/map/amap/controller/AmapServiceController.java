@@ -1,25 +1,25 @@
-package com.pivothub.business.map.controller;
+package com.pivothub.business.map.amap.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.pivothub.business.annotation.MenuPermission;
 
-import com.pivothub.business.map.service.AmapService;
+import com.pivothub.business.map.amap.service.AmapService;
 import com.pivothub.common.result.Result;
 import com.pivothub.common.util.TLUtil;
-import com.pivothub.pojo.dto.business.map.AmapCoordinateDto;
-import com.pivothub.pojo.dto.business.map.AmapPoiIdDto;
-import com.pivothub.pojo.dto.business.map.AmapPoiPageDto;
-import com.pivothub.pojo.dto.business.map.AmapRouteRequestDto;
-import com.pivothub.pojo.dto.business.map.AmapSearchRequestDto;
-import com.pivothub.pojo.vo.business.map.MapCityOptionVo;
-import com.pivothub.pojo.vo.business.map.MapCityVo;
-import com.pivothub.pojo.vo.business.map.MapRouteVo;
-import com.pivothub.pojo.vo.business.map.MapReverseGeocodeVo;
+import com.pivothub.pojo.dto.business.map.amap.AmapCoordinateDto;
+import com.pivothub.pojo.dto.business.map.amap.AmapPoiIdDto;
+import com.pivothub.pojo.dto.business.map.amap.AmapPoiPageDto;
+import com.pivothub.pojo.dto.business.map.amap.AmapRouteRequestDto;
+import com.pivothub.pojo.dto.business.map.amap.AmapSearchRequestDto;
+import com.pivothub.pojo.vo.business.map.amap.MapCityOptionVo;
+import com.pivothub.pojo.vo.business.map.amap.MapCityVo;
+import com.pivothub.pojo.vo.business.map.amap.MapRouteVo;
+import com.pivothub.pojo.vo.business.map.amap.MapReverseGeocodeVo;
 import com.pivothub.pojo.vo.PageVo;
-import com.pivothub.pojo.vo.business.map.SearchPoiVo;
-import com.pivothub.pojo.vo.business.map.SearchTipVo;
+import com.pivothub.pojo.vo.business.map.amap.SearchPoiVo;
+import com.pivothub.pojo.vo.business.map.amap.SearchTipVo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;

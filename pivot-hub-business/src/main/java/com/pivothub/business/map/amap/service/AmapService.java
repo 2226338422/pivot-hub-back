@@ -1,17 +1,17 @@
-package com.pivothub.business.map.service;
+package com.pivothub.business.map.amap.service;
 
-import com.pivothub.pojo.dto.business.map.AmapCoordinateDto;
-import com.pivothub.pojo.dto.business.map.AmapPoiIdDto;
-import com.pivothub.pojo.dto.business.map.AmapPoiPageDto;
-import com.pivothub.pojo.dto.business.map.AmapRouteRequestDto;
-import com.pivothub.pojo.dto.business.map.AmapSearchRequestDto;
-import com.pivothub.pojo.vo.business.map.MapCityOptionVo;
-import com.pivothub.pojo.vo.business.map.MapCityVo;
-import com.pivothub.pojo.vo.business.map.MapRouteVo;
-import com.pivothub.pojo.vo.business.map.MapReverseGeocodeVo;
+import com.pivothub.pojo.dto.business.map.amap.AmapCoordinateDto;
+import com.pivothub.pojo.dto.business.map.amap.AmapPoiIdDto;
+import com.pivothub.pojo.dto.business.map.amap.AmapPoiPageDto;
+import com.pivothub.pojo.dto.business.map.amap.AmapRouteRequestDto;
+import com.pivothub.pojo.dto.business.map.amap.AmapSearchRequestDto;
+import com.pivothub.pojo.vo.business.map.amap.MapCityOptionVo;
+import com.pivothub.pojo.vo.business.map.amap.MapCityVo;
+import com.pivothub.pojo.vo.business.map.amap.MapRouteVo;
+import com.pivothub.pojo.vo.business.map.amap.MapReverseGeocodeVo;
 import com.pivothub.pojo.vo.PageVo;
-import com.pivothub.pojo.vo.business.map.SearchPoiVo;
-import com.pivothub.pojo.vo.business.map.SearchTipVo;
+import com.pivothub.pojo.vo.business.map.amap.SearchPoiVo;
+import com.pivothub.pojo.vo.business.map.amap.SearchTipVo;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 

@@ -1,15 +1,15 @@
-package com.pivothub.business.map.service.impl;
+package com.pivothub.business.map.amap.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pivothub.business.map.config.AmapProperties;
-import com.pivothub.business.map.service.AmapProxyService;
-import com.pivothub.business.map.utils.AmapHttpClient;
-import com.pivothub.business.map.utils.AmapHttpClient.Endpoint;
-import com.pivothub.business.map.utils.AmapRateLimiter;
-import com.pivothub.business.map.utils.ClientIpResolver;
+import com.pivothub.business.map.amap.config.AmapProperties;
+import com.pivothub.business.map.amap.service.AmapProxyService;
+import com.pivothub.business.map.amap.utils.AmapHttpClient;
+import com.pivothub.business.map.amap.utils.AmapHttpClient.Endpoint;
+import com.pivothub.business.map.amap.utils.AmapRateLimiter;
+import com.pivothub.business.map.amap.utils.ClientIpResolver;
 import com.pivothub.common.exception.BusinessException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;

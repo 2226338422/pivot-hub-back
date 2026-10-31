@@ -1,6 +1,6 @@
-package com.pivothub.business.map.service;
+package com.pivothub.business.map.amap.service;
 
-import com.pivothub.business.map.utils.AmapHttpClient;
+import com.pivothub.business.map.amap.utils.AmapHttpClient;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
 
