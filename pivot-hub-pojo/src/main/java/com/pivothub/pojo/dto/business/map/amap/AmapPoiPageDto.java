@@ -1,4 +1,4 @@
-package com.pivothub.pojo.dto.business.map;
+package com.pivothub.pojo.dto.business.map.amap;
 
 import com.pivothub.pojo.dto.PageDto;
 import io.swagger.v3.oas.annotations.media.Schema;
