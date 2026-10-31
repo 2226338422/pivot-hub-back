@@ -1,4 +1,4 @@
-package com.pivothub.pojo.po.business.map;
+package com.pivothub.pojo.po.business.map.favorite;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
