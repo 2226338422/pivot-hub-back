@@ -8,7 +8,7 @@ import com.pivothub.business.annotation.MenuPermission;
 import com.pivothub.business.map.amap.config.AmapProperties;
 import com.pivothub.common.exception.BusinessException;
 import com.pivothub.common.result.Result;
-import com.pivothub.commoncore.constants.map.MapConstants;
+import com.pivothub.commoncore.constants.business.map.MapConstants;
 import com.pivothub.pojo.vo.business.map.amap.MapRuntimeConfigVo;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;

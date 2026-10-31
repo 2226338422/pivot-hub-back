@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Isolation;
 import java.util.List;
 import java.util.Map;
-import static com.pivothub.commoncore.constants.map.MapConstants.*;
+import static com.pivothub.commoncore.constants.business.map.MapConstants.*;
 
 @Service
 public class MapPointServiceImpl implements MapPointService {

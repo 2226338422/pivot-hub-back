@@ -1,6 +1,6 @@
 package com.pivothub.business.map.amap.utils;
 
-import com.pivothub.commoncore.constants.map.MapConstants;
+import com.pivothub.commoncore.constants.business.map.MapConstants;
 
 /**
  * @Description: 高德SDK代理请求路径校验工具，检查GET及代理前缀并拒绝编码和路径规范化歧义

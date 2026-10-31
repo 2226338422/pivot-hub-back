@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Isolation;
 import java.util.List;
-import static com.pivothub.commoncore.constants.map.MapConstants.*;
+import static com.pivothub.commoncore.constants.business.map.MapConstants.*;
 
 @Service
 public class MapThemeServiceImpl implements MapThemeService {

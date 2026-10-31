@@ -9,7 +9,7 @@ import com.pivothub.business.map.amap.service.AmapProxyService;
 import com.pivothub.business.map.amap.utils.AmapHttpClient;
 import com.pivothub.common.util.TLUtil;
 import com.pivothub.common.exception.BusinessException;
-import com.pivothub.commoncore.constants.map.MapConstants;
+import com.pivothub.commoncore.constants.business.map.MapConstants;
 import com.pivothub.business.map.amap.utils.MapProxyPathUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

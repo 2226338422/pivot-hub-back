@@ -1,4 +1,4 @@
-package com.pivothub.commoncore.constants.map;
+package com.pivothub.commoncore.constants.business.map;
 
 /** 地图资源限制与专用 SDK 代理协议。 */
 public final class MapConstants {
