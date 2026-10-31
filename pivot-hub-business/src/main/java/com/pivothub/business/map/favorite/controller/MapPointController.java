@@ -1,14 +1,14 @@
-package com.pivothub.business.map.controller;
+package com.pivothub.business.map.favorite.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.pivothub.business.annotation.MenuPermission;
 
-import com.pivothub.business.map.service.*;
+import com.pivothub.business.map.favorite.service.*;
 import com.pivothub.common.result.Result;
-import com.pivothub.pojo.dto.business.map.*;
-import com.pivothub.pojo.vo.business.map.*;
+import com.pivothub.pojo.dto.business.map.favorite.*;
+import com.pivothub.pojo.vo.business.map.favorite.*;
 import com.pivothub.pojo.vo.PageVo;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;

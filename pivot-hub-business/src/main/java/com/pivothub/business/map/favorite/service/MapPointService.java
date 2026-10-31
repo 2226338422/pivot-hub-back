@@ -1,7 +1,7 @@
-package com.pivothub.business.map.service;
+package com.pivothub.business.map.favorite.service;
 
-import com.pivothub.pojo.dto.business.map.*;
-import com.pivothub.pojo.vo.business.map.*;
+import com.pivothub.pojo.dto.business.map.favorite.*;
+import com.pivothub.pojo.vo.business.map.favorite.*;
 import com.pivothub.pojo.vo.PageVo;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;

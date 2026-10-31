@@ -1,15 +1,15 @@
-package com.pivothub.business.map.service.impl;
+package com.pivothub.business.map.favorite.service.impl;
 
 import org.springframework.beans.BeanUtils;
 import com.pivothub.common.util.TLUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
-import com.pivothub.business.map.mapper.*;
-import com.pivothub.business.map.service.*;
+import com.pivothub.business.map.favorite.mapper.*;
+import com.pivothub.business.map.favorite.service.*;
 import com.pivothub.common.exception.BusinessException;
-import com.pivothub.pojo.dto.business.map.*;
-import com.pivothub.pojo.po.business.map.*;
-import com.pivothub.pojo.vo.business.map.*;
+import com.pivothub.pojo.dto.business.map.favorite.*;
+import com.pivothub.pojo.po.business.map.favorite.*;
+import com.pivothub.pojo.vo.business.map.favorite.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Isolation;

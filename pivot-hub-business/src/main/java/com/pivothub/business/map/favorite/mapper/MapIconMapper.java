@@ -1,7 +1,7 @@
-package com.pivothub.business.map.mapper;
-import com.pivothub.pojo.po.business.map.MapIcon;
-import com.pivothub.pojo.vo.business.map.*;
-import com.pivothub.pojo.dto.business.map.MapPointQueryDto;
+package com.pivothub.business.map.favorite.mapper;
+import com.pivothub.pojo.po.business.map.favorite.MapIcon;
+import com.pivothub.pojo.vo.business.map.favorite.*;
+import com.pivothub.pojo.dto.business.map.favorite.MapPointQueryDto;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
