@@ -1,4 +1,4 @@
-package com.pivothub.pojo.vo.business.map;
+package com.pivothub.pojo.vo.business.map.amap;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
