@@ -1,4 +1,4 @@
-package com.pivothub.pojo.dto.business.map;
+package com.pivothub.pojo.dto.business.map.favorite;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -6,12 +6,12 @@ import java.math.BigDecimal;
 import jakarta.validation.constraints.*;
 
 @Data
-@Schema(description = "新增地图地点")
-public class MapPointCreateDto {
-    @NotBlank(message = "所属主题唯一标识不能为空")
-    @Size(max = 32, message = "所属主题唯一标识最多32字")
-    @Schema(description = "所属主题唯一标识")
-    private String themeId;
+@Schema(description = "修改地图地点")
+public class MapPointUpdateDto {
+    @NotBlank(message = "地点唯一标识不能为空")
+    @Size(max = 32, message = "地点唯一标识最多32字")
+    @Schema(description = "地点唯一标识")
+    private String pointId;
 
     @Size(max = 32, message = "所属分类标识最多32字")
     @Schema(description = "所属分类标识，空表示未分类")
@@ -43,14 +43,4 @@ public class MapPointCreateDto {
     @Size(max = 10000, message = "地点文字笔记最多10000字")
     @Schema(description = "地点文字笔记，最多10000字")
     private String note;
-
-    @NotNull(message = "地点来源不能为空")
-    @Min(value = 0, message = "地点来源只能为0或1")
-    @Max(value = 1, message = "地点来源只能为0或1")
-    @Schema(description = "地点来源：0-手工或地图选点，1-高德POI，默认0")
-    private Integer source = 0;
-
-    @Size(max = 100, message = "高德POI标识最多100字")
-    @Schema(description = "高德POI标识，高德来源时必填")
-    private String amapPoiId;
 }
