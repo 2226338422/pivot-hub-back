@@ -11,4 +11,6 @@ public interface SysUserMapper {
     int insertUser(SysUser user);
 
     int updateProfile(SysUser user);
+
+    int updateEmail(@Param("uuid") String uuid, @Param("email") String email);
 }

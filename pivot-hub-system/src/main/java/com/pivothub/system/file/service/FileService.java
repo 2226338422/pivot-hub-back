@@ -29,4 +29,9 @@ public interface FileService {
      * 单个文件访问地址，缺省返回空串。
      */
     String url(String uuid);
+
+    /**
+     * 默认头像的文件 uuid（查 sys_file type=default_avatar），无则返回空串。
+     */
+    String defaultAvatarFileId();
 }

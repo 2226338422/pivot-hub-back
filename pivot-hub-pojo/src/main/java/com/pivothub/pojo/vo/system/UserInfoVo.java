@@ -14,8 +14,8 @@ public class UserInfoVo {
     private String nickname;
     @Schema(description = "用户邮箱")
     private String email;
-    @Schema(description = "用户头像地址")
-    private String avatar;
+    @Schema(description = "头像文件uuid（关联 sys_file.uuid，无头像时为默认头像uuid）")
+    private String avatarFileId;
     @Schema(description = "角色标识")
     private String roleId;
     @Schema(description = "用户状态：1-启用，0-禁用")

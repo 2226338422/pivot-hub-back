@@ -153,7 +153,7 @@ CREATE TABLE IF NOT EXISTS sys_user (
     code           VARCHAR(64)  NULL COMMENT '用户编码',
     nickname       VARCHAR(64)  NULL COMMENT '昵称',
     email          VARCHAR(128) NULL COMMENT '邮箱',
-    avatar         VARCHAR(512) NULL COMMENT '头像URL',
+    avatar_file_id VARCHAR(32)  NULL COMMENT '头像文件uuid（关联 sys_file.uuid）',
     role_id        VARCHAR(32)  NULL COMMENT '角色uuid',
     status         TINYINT      NOT NULL DEFAULT 1 COMMENT '状态 0-禁用 1-正常',
     remark         VARCHAR(500) NULL COMMENT '备注',

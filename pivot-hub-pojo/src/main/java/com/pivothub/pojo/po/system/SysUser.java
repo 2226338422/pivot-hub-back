@@ -28,8 +28,8 @@ public class SysUser extends BasePo {
     /** 邮箱 */
     private String email;
 
-    /** 头像URL */
-    private String avatar;
+    /** 头像文件uuid（关联 sys_file.uuid） */
+    private String avatarFileId;
 
     /** 角色ID */
     private String roleId;

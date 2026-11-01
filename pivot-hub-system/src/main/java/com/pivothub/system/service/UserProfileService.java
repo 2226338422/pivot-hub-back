@@ -11,4 +11,9 @@ public interface UserProfileService {
     UserInfoVo refreshCache(String userId);
 
     UserInfoVo updateProfile(SysUser user);
+
+    /**
+     * 换绑邮箱：校验验证码后更新登录邮箱。
+     */
+    void rebindEmail(String userId, String newEmail, String code);
 }

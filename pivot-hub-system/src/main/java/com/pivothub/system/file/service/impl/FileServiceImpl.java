@@ -4,6 +4,7 @@ import com.pivothub.common.config.AliyunConfig;
 import com.pivothub.common.exception.BusinessException;
 import com.pivothub.common.util.OSSUtil;
 import com.pivothub.common.util.TLUtil;
+import com.pivothub.commoncore.enums.FileType;
 import com.pivothub.pojo.po.system.SysFile;
 import com.pivothub.pojo.po.system.SysUser;
 import com.pivothub.pojo.vo.system.file.FileUploadVo;
@@ -115,6 +116,12 @@ public class FileServiceImpl implements FileService {
         }
         Map<String, String> map = urls(uuid);
         return map.getOrDefault(uuid, "");
+    }
+
+    @Override
+    public String defaultAvatarFileId() {
+        SysFile file = fileMapper.selectFirstByType(FileType.DEFAULT_AVATAR.getValue());
+        return file == null ? "" : file.getUuid();
     }
 
     /** 解析逗号分隔的 uuid 串，去重、过滤空串。 */

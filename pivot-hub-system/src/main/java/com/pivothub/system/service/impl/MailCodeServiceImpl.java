@@ -28,7 +28,7 @@ public class MailCodeServiceImpl implements MailCodeService {
 
     @Override
     public void sendCode(String email, String scene) {
-        if (!StringUtils.hasText(email) || !Set.of("login", "register", "reset").contains(scene)) {
+        if (!StringUtils.hasText(email) || !Set.of("login", "register", "reset", "rebind").contains(scene)) {
             throw new IllegalArgumentException("邮箱或验证码场景无效");
         }
         String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
