@@ -5,7 +5,7 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-/** 复用 Nacos 已有 aliyun 配置，不输出访问凭证。 */
+/** 阿里云 OSS 配置：共用 AK/SK/endpoint/region，区分公共读/私有 bucket。 */
 @Getter
 @Setter
 @Component
@@ -13,8 +13,12 @@ import org.springframework.stereotype.Component;
 public class AliyunConfig {
     private String accessKeyId;
     private String accessKeySecret;
-    private String roleArn;
     private String endpoint;
-    private String bucketName;
     private String region;
+    /** 公共读 bucket */
+    private String publicBucket;
+    /** 私有 bucket */
+    private String privateBucket;
+    /** 私有 URL 有效期（秒），默认 6 小时 */
+    private Long privateUrlTtlSeconds = 21600L;
 }

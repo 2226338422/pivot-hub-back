@@ -20,11 +20,8 @@ public class SysFile extends BasePo {
     /** 原始文件名 */
     private String fileName;
 
-    /** 文件存储路径 */
+    /** 文件存储路径（OSS objectKey） */
     private String filePath;
-
-    /** 文件 URL（可直接访问） */
-    private String url;
 
     /** 文件大小（字节） */
     private Long fileSize;
@@ -37,6 +34,12 @@ public class SysFile extends BasePo {
 
     /** 所属业务模块 */
     private String module;
+
+    /** 文件类型（avatar-头像 default_avatar-默认头像） */
+    private String type;
+
+    /** 访问模式 public-公共读 private-私有读 */
+    private String acl;
 
     /** 上传者 uuid */
     private String uploaderId;
