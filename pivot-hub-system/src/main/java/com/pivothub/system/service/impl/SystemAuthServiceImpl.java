@@ -12,11 +12,13 @@ import com.pivothub.pojo.dto.system.EmailLoginDto;
 import com.pivothub.pojo.dto.system.TokenDto;
 import com.pivothub.commoncore.enums.ClientType;
 import com.pivothub.pojo.po.system.SysUser;
+import com.pivothub.pojo.po.system.SysRole;
 import com.pivothub.pojo.vo.TokenVo;
 import com.pivothub.system.service.AuthSessionService;
 import com.pivothub.system.service.SystemAuthService;
 import com.pivothub.pojo.dto.redis.system.TokenRedisDto;
 import com.pivothub.system.mapper.SysUserMapper;
+import com.pivothub.system.mapper.SysRoleMapper;
 import com.pivothub.system.service.MailCodeService;
 import com.pivothub.system.service.UserProfileService;
 import io.jsonwebtoken.Claims;
@@ -42,6 +44,9 @@ public class SystemAuthServiceImpl implements SystemAuthService {
     private UserProfileService userProfileService;
     @Autowired
     private SysUserMapper userMapper;
+
+    @Autowired
+    private SysRoleMapper roleMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -105,6 +110,11 @@ public class SystemAuthServiceImpl implements SystemAuthService {
         user.setNickname("用户" + user.getUuid().substring(0, Math.min(8, user.getUuid().length())));
         user.setEmail(email);
         user.setStatus(1);
+        // 注册时赋予默认角色（defa=1 且启用），无默认角色则保持空角色
+        SysRole defaultRole = roleMapper.selectDefaultRole();
+        if (defaultRole != null) {
+            user.setRoleId(defaultRole.getUuid());
+        }
         try {
             if (userMapper.insertUser(user) != 1) {
                 throw new IllegalStateException("用户注册失败");

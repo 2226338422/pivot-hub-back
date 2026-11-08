@@ -10,6 +10,8 @@ public interface SysRoleMapper {
     SysRole selectLiveById(@Param("roleId") String roleId);
     SysRole selectByIdForUpdate(@Param("roleId") String roleId);
     List<String> selectRoleIdsForUpdate();
+    /** 查询默认角色（defa=1 且启用），无则返回 null。 */
+    SysRole selectDefaultRole();
     int clearDefaultRoles(@Param("operatorId") String operatorId);
     int countByCode(@Param("code") String code);
     long countUserReferences(@Param("roleId") String roleId);

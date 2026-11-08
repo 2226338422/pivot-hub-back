@@ -34,6 +34,12 @@
     <select id="selectByIdForUpdate" resultMap="RoleMap">
         SELECT <include refid="columns"/> FROM sys_role WHERE uuid = #{roleId} FOR UPDATE
     </select>
+    <select id="selectDefaultRole" resultMap="RoleMap">
+        SELECT <include refid="columns"/> FROM sys_role
+        WHERE defa = 1 AND status = 1
+        ORDER BY sort ASC, uuid ASC
+        LIMIT 1
+    </select>
     <select id="selectRoleIdsForUpdate" resultType="string">
         SELECT uuid FROM sys_role ORDER BY uuid ASC FOR UPDATE
     </select>
