@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pivothub.system.mapper.SystemNotifySettingMapper">
+
+    <resultMap id="SysNotifySettingResultMap" type="com.pivothub.pojo.po.system.SysNotifySetting">
+        <id column="uuid" property="uuid"/>
+        <result column="user_id" property="userId"/>
+        <result column="channel" property="channel"/>
+        <result column="name" property="name"/>
+        <result column="detail" property="detail"/>
+        <result column="enabled" property="enabled"/>
+        <result column="require_bind" property="requireBind"/>
+        <result column="is_default" property="isDefault"/>
+        <result column="sort" property="sort"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="update_user_id" property="updateUserId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="settingColumns">
+        uuid, user_id, channel, name, detail, enabled, require_bind, is_default, sort,
+        create_user_id, update_user_id, create_time, update_time
+    </sql>
+
+    <select id="selectDefaults" resultMap="SysNotifySettingResultMap">
+        SELECT <include refid="settingColumns"/>
+        FROM sys_notify_setting
+        WHERE user_id IS NULL
+        ORDER BY sort ASC
+    </select>
+
+    <select id="selectByUserId" resultMap="SysNotifySettingResultMap">
+        SELECT <include refid="settingColumns"/>
+        FROM sys_notify_setting
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insert" parameterType="com.pivothub.pojo.po.system.SysNotifySetting">
+        INSERT INTO sys_notify_setting
+        (uuid, user_id, channel, name, detail, enabled, require_bind, is_default, sort,
+         create_user_id, update_user_id)
+        VALUES
+        (#{uuid}, #{userId}, #{channel}, #{name}, #{detail}, #{enabled}, #{requireBind}, #{isDefault}, #{sort},
+         #{createUserId}, #{updateUserId})
+    </insert>
+
+    <update id="updateEnabled">
+        UPDATE sys_notify_setting
+        SET enabled = #{enabled}, update_user_id = #{userId}, update_time = NOW()
+        WHERE user_id = #{userId} AND channel = #{channel}
+    </update>
+</mapper>
