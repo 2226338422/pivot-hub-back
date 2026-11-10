@@ -36,10 +36,7 @@ public class WxPusherServiceImpl implements WxPusherService {
             return vo;
         }
         // 用用户uuid作为 extra，回调时据此反查用户
-        String url = client.createQrcode(userId);
-        vo.setBound(false);
-        vo.setUrl(url);
-        return vo;
+        return client.createQrcode(userId);
     }
 
     @Override

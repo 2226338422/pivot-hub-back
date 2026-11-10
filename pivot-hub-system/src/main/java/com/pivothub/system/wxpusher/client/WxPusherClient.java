@@ -3,6 +3,7 @@ package com.pivothub.system.wxpusher.client;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.pivothub.common.exception.BusinessException;
+import com.pivothub.pojo.vo.system.wxpusher.WxPusherQrcodeVo;
 import com.pivothub.system.wxpusher.config.WxPusherProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +47,8 @@ public class WxPusherClient {
         }
     }
 
-    /** 创建带参数二维码，extra 携带业务标识（用户uuid），返回二维码短链接。 */
-    public String createQrcode(String extra) {
+    /** 创建带参数二维码，extra 携带业务标识（用户uuid），返回二维码地址与关注短链接。 */
+    public WxPusherQrcodeVo createQrcode(String extra) {
         ensureConfigured();
         Map<String, Object> body = new HashMap<>();
         body.put("appToken", properties.getAppToken());
@@ -63,7 +64,12 @@ public class WxPusherClient {
         if (url == null || url.isBlank()) {
             throw new BusinessException(502, "WxPusher 创建二维码失败：未返回链接");
         }
-        return url;
+        WxPusherQrcodeVo vo = new WxPusherQrcodeVo();
+        vo.setUrl(url);
+        vo.setShortUrl(data.getString("shortUrl"));
+        vo.setExpiresIn(1800);
+        vo.setBound(false);
+        return vo;
     }
 
     private JSONObject post(String url, Map<String, Object> body) {
