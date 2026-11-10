@@ -71,6 +71,24 @@ CREATE TABLE IF NOT EXISTS sys_menu (
     KEY idx_sys_menu_module_id (module_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统菜单表';
 
+CREATE TABLE IF NOT EXISTS sys_notify_setting (
+    uuid           VARCHAR(32) NOT NULL PRIMARY KEY COMMENT '主键',
+    user_id        VARCHAR(32) NULL COMMENT '用户uuid，NULL 表示全局默认行',
+    channel        VARCHAR(32) NOT NULL COMMENT '通知渠道 inbox/email/wxpusher',
+    name           VARCHAR(64) NULL COMMENT '渠道名称',
+    detail         VARCHAR(256) NULL COMMENT '渠道说明文案',
+    enabled        TINYINT     NOT NULL DEFAULT 0 COMMENT '0-关闭 1-开启',
+    require_bind   TINYINT     NOT NULL DEFAULT 0 COMMENT '0-无需绑定 1-需绑定',
+    is_default     TINYINT     NOT NULL DEFAULT 0 COMMENT '0-用户设置 1-全局默认',
+    sort           INT         NOT NULL DEFAULT 0 COMMENT '排序，正序展示',
+    create_user_id VARCHAR(32) NULL COMMENT '创建人uuid',
+    update_user_id VARCHAR(32) NULL COMMENT '更新人uuid',
+    create_time    DATETIME    NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time    DATETIME    NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    UNIQUE KEY uk_sys_notify_setting_user_channel (user_id, channel),
+    UNIQUE KEY uk_sys_notify_setting_default_channel (channel, is_default)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户通知渠道设置表';
+
 CREATE TABLE IF NOT EXISTS sys_operation_log (
     uuid            VARCHAR(32)  NOT NULL PRIMARY KEY COMMENT '主键',
     user_id         VARCHAR(32)  NULL COMMENT '用户uuid',
@@ -173,6 +191,8 @@ CREATE TABLE IF NOT EXISTS sys_user_platform (
     qq_status      TINYINT      NOT NULL DEFAULT 0 COMMENT 'QQ绑定状态 0-未绑定 1-已绑定',
     wx_open_id     VARCHAR(128) NULL COMMENT '微信开放平台openid',
     wx_status      TINYINT      NOT NULL DEFAULT 0 COMMENT '微信绑定状态 0-未绑定 1-已绑定',
+    wxpusher_uid   VARCHAR(64)  NULL COMMENT 'WxPusher推送uid',
+    wxpusher_status TINYINT     NOT NULL DEFAULT 0 COMMENT 'WxPusher绑定状态 0-未绑定 1-已绑定',
     mall_aes       VARCHAR(256) NULL COMMENT 'Mall AES加密key',
     mall_status    TINYINT      NOT NULL DEFAULT 0 COMMENT 'Mall状态 0-禁用 1-正常',
     create_user_id VARCHAR(32)  NULL COMMENT '创建人uuid',

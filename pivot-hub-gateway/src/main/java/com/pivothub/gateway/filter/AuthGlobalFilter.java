@@ -39,6 +39,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
             "/system/auth/refresh",
             "/system/auth/mail/**",
             "/system/mail/**",
+            "/system/wxpusher/callback",
             "/doc.html",
             "/webjars/**",
             "/v3/api-docs/**",
