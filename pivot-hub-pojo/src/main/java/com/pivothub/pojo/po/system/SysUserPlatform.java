@@ -32,6 +32,12 @@ public class SysUserPlatform extends BasePo {
     /** 微信绑定状态 0-未绑定 1-已绑定 */
     private Integer wxStatus;
 
+    /** WxPusher 推送uid */
+    private String wxpusherUid;
+
+    /** WxPusher绑定状态 0-未绑定 1-已绑定 */
+    private Integer wxpusherStatus;
+
     /**  Mall AES加密key（用于业务关联） */
     private String mallAes;
 

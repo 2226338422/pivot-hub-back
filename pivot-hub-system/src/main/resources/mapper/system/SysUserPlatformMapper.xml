@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pivothub.system.mapper.SysUserPlatformMapper">
+    <resultMap id="SysUserPlatformResultMap" type="com.pivothub.pojo.po.system.SysUserPlatform">
+        <id column="uuid" property="uuid"/>
+        <result column="user_id" property="userId"/>
+        <result column="qq_open_id" property="qqOpenId"/>
+        <result column="qq_status" property="qqStatus"/>
+        <result column="wx_open_id" property="wxOpenId"/>
+        <result column="wx_status" property="wxStatus"/>
+        <result column="wxpusher_uid" property="wxpusherUid"/>
+        <result column="wxpusher_status" property="wxpusherStatus"/>
+        <result column="mall_aes" property="mallAes"/>
+        <result column="mall_status" property="mallStatus"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="update_user_id" property="updateUserId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="platformColumns">
+        uuid, user_id, qq_open_id, qq_status, wx_open_id, wx_status,
+        wxpusher_uid, wxpusher_status, mall_aes, mall_status,
+        create_user_id, update_user_id, create_time, update_time
+    </sql>
+
+    <select id="selectByUserId" resultMap="SysUserPlatformResultMap">
+        SELECT <include refid="platformColumns"/>
+        FROM sys_user_platform WHERE user_id = #{userId} LIMIT 1
+    </select>
+
+    <select id="selectActiveByWxpusherUid" resultMap="SysUserPlatformResultMap">
+        SELECT <include refid="platformColumns"/>
+        FROM sys_user_platform
+        WHERE wxpusher_uid = #{uid} AND wxpusher_status = 1
+        LIMIT 1
+    </select>
+
+    <insert id="insert" parameterType="com.pivothub.pojo.po.system.SysUserPlatform">
+        INSERT INTO sys_user_platform
+        (uuid, user_id, qq_open_id, qq_status, wx_open_id, wx_status,
+         wxpusher_uid, wxpusher_status, mall_aes, mall_status,
+         create_user_id, update_user_id, create_time, update_time)
+        VALUES
+        (#{uuid}, #{userId}, #{qqOpenId}, #{qqStatus}, #{wxOpenId}, #{wxStatus},
+         #{wxpusherUid}, #{wxpusherStatus}, #{mallAes}, #{mallStatus},
+         #{createUserId}, #{updateUserId}, NOW(), NOW())
+    </insert>
+
+    <update id="updateWxpusher" parameterType="com.pivothub.pojo.po.system.SysUserPlatform">
+        UPDATE sys_user_platform
+        SET wxpusher_uid = #{wxpusherUid}, wxpusher_status = #{wxpusherStatus},
+            update_user_id = #{updateUserId}, update_time = NOW()
+        WHERE uuid = #{uuid}
+    </update>
+
+    <!-- 换绑时让旧账号的绑定失效，uid 保留作为历史记录 -->
+    <update id="deactivateByWxpusherUid">
+        UPDATE sys_user_platform
+        SET wxpusher_status = 0, update_time = NOW()
+        WHERE wxpusher_uid = #{uid} AND wxpusher_status = 1
+    </update>
+
+    <!-- 解绑只置状态，保留 wxpusher_uid -->
+    <update id="unbind">
+        UPDATE sys_user_platform
+        SET wxpusher_status = 0, update_user_id = #{userId}, update_time = NOW()
+        WHERE user_id = #{userId}
+    </update>
+</mapper>
