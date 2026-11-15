@@ -214,3 +214,31 @@ CREATE TABLE IF NOT EXISTS sys_user_role (
     update_time    DATETIME    NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     UNIQUE KEY uk_sys_user_role_user_role (user_id, role_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户角色关联表';
+
+CREATE TABLE IF NOT EXISTS sys_announcement (
+    uuid              VARCHAR(32)  NOT NULL PRIMARY KEY COMMENT '主键',
+    title             VARCHAR(200) NOT NULL COMMENT '公告标题',
+    content           TEXT         NOT NULL COMMENT '公告正文',
+    status            TINYINT      NOT NULL DEFAULT 0 COMMENT '0-草稿 1-已发布 2-已撤回',
+    publisher_id      VARCHAR(32)  NULL COMMENT '发布人uuid',
+    publish_time      DATETIME     NULL COMMENT '发布时间',
+    create_user_id    VARCHAR(32)  NULL COMMENT '创建人uuid',
+    update_user_id    VARCHAR(32)  NULL COMMENT '更新人uuid',
+    create_time       DATETIME     NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time       DATETIME     NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    KEY idx_sys_announcement_status_publish (status, publish_time, uuid),
+    KEY idx_sys_announcement_create_time (create_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统公告表';
+
+CREATE TABLE IF NOT EXISTS sys_announcement_file (
+    uuid              VARCHAR(32) NOT NULL PRIMARY KEY COMMENT '主键',
+    announcement_id   VARCHAR(32) NOT NULL COMMENT '公告uuid',
+    file_id           VARCHAR(32) NOT NULL COMMENT '附件uuid',
+    sort              INT NOT NULL DEFAULT 0 COMMENT '图片展示顺序',
+    create_user_id    VARCHAR(32) NULL COMMENT '创建人uuid',
+    update_user_id    VARCHAR(32) NULL COMMENT '更新人uuid',
+    create_time       DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time       DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    UNIQUE KEY uk_sys_announcement_file (announcement_id, file_id),
+    KEY idx_sys_announcement_file_sort (announcement_id, sort, uuid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='公告附件关联表';
