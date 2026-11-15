@@ -3,16 +3,19 @@ package com.pivothub.commoncore.enums;
 import java.util.Arrays;
 
 /** 文件类型。 */
-public enum FileType implements ValueEnum<String> {
-    AVATAR("avatar", "用户头像"),
-    DEFAULT_AVATAR("default_avatar", "默认头像");
+public enum FileType implements ValueEnum<String>, ValueTwoEnum<String> {
+    AVATAR("avatar", "用户头像", "Avatar"),
+    DEFAULT_AVATAR("default_avatar", "默认头像", "Avatar"),
+    ANNOUNCEMENT_FILE("announcement_file", "公告附件", "Announcement");
 
     private final String value;
     private final String name;
+    private final String module;
 
-    FileType(String value, String name) {
+    FileType(String value, String name, String module) {
         this.value = value;
         this.name = name;
+        this.module = module;
     }
 
     @Override
@@ -23,6 +26,20 @@ public enum FileType implements ValueEnum<String> {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getFirstName() {
+        return name;
+    }
+
+    @Override
+    public String getSecondName() {
+        return module;
+    }
+
+    public String getModule() {
+        return module;
     }
 
     public static FileType fromValue(String value) {
