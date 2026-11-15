@@ -1,10 +1,12 @@
 package com.pivothub.system.mapper;
 
 import com.pivothub.pojo.po.system.SysMailCode;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 
+@Mapper
 public interface SysMailCodeMapper {
     SysMailCode selectUsable(@Param("email") String email,
                              @Param("scene") String scene,

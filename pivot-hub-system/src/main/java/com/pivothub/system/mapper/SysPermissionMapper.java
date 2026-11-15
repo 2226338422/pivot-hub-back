@@ -1,9 +1,11 @@
 package com.pivothub.system.mapper;
 
 import com.pivothub.pojo.po.system.SysPermission;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
+@Mapper
 public interface SysPermissionMapper {
     List<SysPermission> selectRolePermissions(@Param("roleId") String roleId);
     List<String> selectActiveRoleMenuIds(@Param("roleId") String roleId);

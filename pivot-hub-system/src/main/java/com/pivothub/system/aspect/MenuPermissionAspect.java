@@ -34,7 +34,7 @@ public class MenuPermissionAspect {
     @Autowired
     private SysUserMapper userMapper;
 
-    @Around("execution(public * com.pivothub.system.controller..*(..)) && "
+    @Around("execution(public * com.pivothub.system..controller..*(..)) && "
             + "(@within(com.pivothub.system.annotation.MenuPermission) "
             + "|| @annotation(com.pivothub.system.annotation.MenuPermission))")
     public Object checkMenuPermission(ProceedingJoinPoint joinPoint) throws Throwable {

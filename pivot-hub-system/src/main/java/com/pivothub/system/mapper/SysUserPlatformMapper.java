@@ -1,8 +1,10 @@
 package com.pivothub.system.mapper;
 
 import com.pivothub.pojo.po.system.SysUserPlatform;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+@Mapper
 public interface SysUserPlatformMapper {
     SysUserPlatform selectByUserId(@Param("userId") String userId);
 

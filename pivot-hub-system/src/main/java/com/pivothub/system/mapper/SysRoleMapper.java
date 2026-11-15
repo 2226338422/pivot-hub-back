@@ -2,9 +2,11 @@ package com.pivothub.system.mapper;
 
 import com.pivothub.pojo.dto.system.RolePageDto;
 import com.pivothub.pojo.po.system.SysRole;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
+@Mapper
 public interface SysRoleMapper {
     List<SysRole> selectPage(RolePageDto query);
     SysRole selectLiveById(@Param("roleId") String roleId);

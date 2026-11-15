@@ -1,8 +1,10 @@
 package com.pivothub.system.mapper;
 
 import com.pivothub.pojo.po.system.SysUser;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+@Mapper
 public interface SysUserMapper {
     SysUser selectByEmail(@Param("email") String email);
 

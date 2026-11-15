@@ -1,10 +1,12 @@
 package com.pivothub.system.mapper;
 
 import com.pivothub.pojo.po.system.SysNotifySetting;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@Mapper
 public interface SystemNotifySettingMapper {
     /** 查询全局默认行（user_id IS NULL）。 */
     List<SysNotifySetting> selectDefaults();

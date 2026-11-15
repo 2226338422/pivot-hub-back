@@ -1,11 +1,13 @@
 package com.pivothub.system.mapper;
 
 import com.pivothub.pojo.po.system.SysFile;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-/** 文件记录表 Mapper（包扫描注入，无需 @Mapper 注解）。 */
+/** 文件记录表 Mapper。 */
+@Mapper
 public interface SysFileMapper {
 
     int insert(SysFile file);
