@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pivothub.system.announcement.mapper.SysAnnouncementFileMapper">
+    <resultMap id="AnnouncementFileMap" type="com.pivothub.pojo.po.system.SysAnnouncementFile">
+        <id column="uuid" property="uuid"/>
+        <result column="announcement_id" property="announcementId"/>
+        <result column="file_id" property="fileId"/>
+        <result column="sort" property="sort"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="update_user_id" property="updateUserId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="selectByAnnouncementIds" resultMap="AnnouncementFileMap">
+        SELECT uuid, announcement_id, file_id, sort,
+               create_user_id, update_user_id, create_time, update_time
+        FROM sys_announcement_file
+        WHERE announcement_id IN
+        <foreach collection="announcementIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY announcement_id, sort, uuid
+    </select>
+
+    <delete id="deleteByAnnouncementId">
+        DELETE FROM sys_announcement_file WHERE announcement_id = #{announcementId}
+    </delete>
+
+    <insert id="insertBatch">
+        INSERT INTO sys_announcement_file
+            (uuid, announcement_id, file_id, sort, create_user_id, update_user_id)
+        VALUES
+        <foreach collection="relations" item="relation" separator=",">
+            (#{relation.uuid}, #{relation.announcementId}, #{relation.fileId},
+             #{relation.sort}, #{relation.createUserId}, #{relation.updateUserId})
+        </foreach>
+    </insert>
+</mapper>

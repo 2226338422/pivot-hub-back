@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pivothub.system.announcement.mapper.SysAnnouncementMapper">
+    <resultMap id="AnnouncementVoMap" type="com.pivothub.pojo.vo.system.announcement.AnnouncementVo">
+        <id column="uuid" property="uuid"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="status" property="status"/>
+        <result column="publisher_id" property="publisherId"/>
+        <result column="publisher_name" property="publisherName"/>
+        <result column="publish_time" property="publishTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <resultMap id="AnnouncementPoMap" type="com.pivothub.pojo.po.system.SysAnnouncement">
+        <id column="uuid" property="uuid"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="status" property="status"/>
+        <result column="publisher_id" property="publisherId"/>
+        <result column="publish_time" property="publishTime"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="update_user_id" property="updateUserId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <resultMap id="LatestMap" type="com.pivothub.pojo.vo.system.announcement.AnnouncementLatestVo">
+        <result column="title" property="title"/>
+        <result column="publish_time" property="publishTime"/>
+    </resultMap>
+
+    <sql id="columns">
+        a.uuid, a.title, a.content, a.status, a.publisher_id,
+        u.nickname AS publisher_name, a.publish_time,
+        a.create_time, a.update_time
+    </sql>
+
+    <select id="selectLatestPublished" resultMap="LatestMap">
+        SELECT uuid, title, publish_time
+        FROM sys_announcement
+        WHERE status = 1 AND publish_time IS NOT NULL
+        ORDER BY publish_time DESC, uuid DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectFeed" resultMap="AnnouncementVoMap">
+        SELECT <include refid="columns"/>
+        FROM sys_announcement a
+        <if test="query.cursorId != null">
+            INNER JOIN sys_announcement anchor ON anchor.uuid = #{query.cursorId}
+                AND anchor.publish_time IS NOT NULL
+        </if>
+        LEFT JOIN sys_user u ON u.uuid = a.publisher_id
+        WHERE a.status = 1 AND a.publish_time IS NOT NULL
+        <if test="query.title != null and query.title != ''">
+            AND a.title LIKE CONCAT('%', #{query.title}, '%')
+        </if>
+        <if test="query.cursorId != null">
+            <choose>
+                <when test="query.publishTimeOrder == 1">
+                    AND (a.publish_time &gt; anchor.publish_time
+                         OR (a.publish_time = anchor.publish_time AND a.uuid &gt; anchor.uuid))
+                </when>
+                <otherwise>
+                    AND (a.publish_time &lt; anchor.publish_time
+                         OR (a.publish_time = anchor.publish_time AND a.uuid &lt; anchor.uuid))
+                </otherwise>
+            </choose>
+        </if>
+        <choose>
+            <when test="query.publishTimeOrder == 1">ORDER BY a.publish_time ASC, a.uuid ASC</when>
+            <otherwise>ORDER BY a.publish_time DESC, a.uuid DESC</otherwise>
+        </choose>
+        LIMIT #{limitPlusOne}
+    </select>
+
+    <select id="selectPage" resultMap="AnnouncementVoMap">
+        SELECT <include refid="columns"/>
+        FROM sys_announcement a
+        LEFT JOIN sys_user u ON u.uuid = a.publisher_id
+        <where>
+            <if test="query.status != null">a.status = #{query.status}</if>
+            <if test="query.title != null and query.title != ''">
+                AND a.title LIKE CONCAT('%', #{query.title}, '%')
+            </if>
+        </where>
+        ORDER BY (a.publish_time IS NULL) ASC,
+        <choose>
+            <when test="query.publishTimeOrder == 1">a.publish_time ASC,</when>
+            <otherwise>a.publish_time DESC,</otherwise>
+        </choose>
+        <if test="query.createTimeOrder != null">
+            <choose>
+                <when test="query.createTimeOrder == 1">a.create_time ASC,</when>
+                <otherwise>a.create_time DESC,</otherwise>
+            </choose>
+        </if>
+        <if test="query.updateTimeOrder != null">
+            <choose>
+                <when test="query.updateTimeOrder == 1">a.update_time ASC,</when>
+                <otherwise>a.update_time DESC,</otherwise>
+            </choose>
+        </if>
+        <choose>
+            <when test="query.publishTimeOrder == 1">a.uuid ASC</when>
+            <otherwise>a.uuid DESC</otherwise>
+        </choose>
+    </select>
+
+    <select id="selectById" resultMap="AnnouncementVoMap">
+        SELECT <include refid="columns"/>
+        FROM sys_announcement a LEFT JOIN sys_user u ON u.uuid = a.publisher_id
+        WHERE a.uuid = #{id}
+    </select>
+
+    <select id="selectByIdForUpdate" resultMap="AnnouncementPoMap">
+        SELECT a.uuid, a.title, a.content, a.status, a.publisher_id,
+               a.publish_time, a.create_user_id, a.update_user_id,
+               a.create_time, a.update_time
+        FROM sys_announcement a WHERE a.uuid = #{id} FOR UPDATE
+    </select>
+
+    <insert id="insert">
+        INSERT INTO sys_announcement
+            (uuid, title, content, status, publisher_id, publish_time,
+             create_user_id, update_user_id)
+        VALUES (#{uuid}, #{title}, #{content}, #{status}, NULL, NULL,
+                #{createUserId}, #{updateUserId})
+    </insert>
+
+    <update id="updateDraft">
+        UPDATE sys_announcement SET title = #{title}, content = #{content},
+            update_user_id = #{operatorId}
+        WHERE uuid = #{id} AND status = 0
+    </update>
+
+    <update id="touchDraft">
+        UPDATE sys_announcement SET update_time = NOW(), update_user_id = #{operatorId}
+        WHERE uuid = #{id} AND status = 0
+    </update>
+
+    <update id="publish">
+        UPDATE sys_announcement SET status = 1, publisher_id = #{operatorId},
+            publish_time = NOW(), update_user_id = #{operatorId}
+        WHERE uuid = #{id} AND status = 0
+    </update>
+
+    <update id="withdraw">
+        UPDATE sys_announcement SET status = 2,
+            update_user_id = #{operatorId}
+        WHERE uuid = #{id} AND status = 1
+    </update>
+</mapper>
