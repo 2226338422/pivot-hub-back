@@ -12,4 +12,6 @@ public class SystemRedisConstants {
     /** 邮箱验证码发送限流 key 前缀，后接 email。 */
     public static final String MAIL_CODE_RATE_LIMIT_KEY_PREFIX = KEY_SYSTEM_UNITE_PREFIX + "mail:rate:";
     public static final Long MAIL_CODE_TTL = 5L;
+    /** 通知投递锁 key 前缀，后接 eventId:userId:channel。 */
+    public static final String NOTIFY_DELIVERY_LOCK_KEY_PREFIX = KEY_SYSTEM_UNITE_PREFIX + "notify:delivery:";
 }
