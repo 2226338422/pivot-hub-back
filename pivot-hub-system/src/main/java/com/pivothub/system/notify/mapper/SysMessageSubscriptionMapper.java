@@ -1,0 +1,25 @@
+package com.pivothub.system.notify.mapper;
+
+import com.pivothub.pojo.po.system.SysMessageSubscription;
+import com.pivothub.pojo.vo.system.notify.MessageSubscriptionVo;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+/** 消息订阅默认配置和用户设置。 */
+@Mapper
+public interface SysMessageSubscriptionMapper {
+    /** 查询默认展示配置及当前用户的有效开关。 */
+    List<MessageSubscriptionVo> selectSettings(@Param("userId") String userId);
+
+    /** 根据类型查询全局默认配置。 */
+    SysMessageSubscription selectDefault(@Param("messageType") String messageType);
+
+    /** 新增或更新用户对指定类型的设置。 */
+    int upsertUserSetting(SysMessageSubscription subscription);
+
+    /** 查询已订阅的全部活跃用户 UUID。 */
+    List<String> selectSubscribedUserIds(@Param("messageType") String messageType,
+                                         @Param("defaultEnabled") Integer defaultEnabled);
+}

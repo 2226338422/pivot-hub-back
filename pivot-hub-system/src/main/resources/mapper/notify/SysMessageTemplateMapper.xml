@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pivothub.system.notify.mapper.SysMessageTemplateMapper">
+    <sql id="templateColumns">
+        uuid, message_type AS messageType,
+        body_template AS bodyTemplate, item_template AS itemTemplate,
+        create_time AS createTime, update_time AS updateTime
+    </sql>
+
+    <select id="selectByType" resultType="com.pivothub.pojo.po.system.SysMessageTemplate">
+        SELECT <include refid="templateColumns"/>
+        FROM sys_message_template
+        WHERE message_type = #{messageType}
+    </select>
+
+    <select id="selectByUuid" resultType="com.pivothub.pojo.po.system.SysMessageTemplate">
+        SELECT <include refid="templateColumns"/>
+        FROM sys_message_template
+        WHERE uuid = #{uuid}
+    </select>
+
+    <select id="selectPage" parameterType="com.pivothub.pojo.dto.system.notify.MessageTemplatePageDto"
+            resultType="com.pivothub.pojo.po.system.SysMessageTemplate">
+        SELECT <include refid="templateColumns"/>
+        FROM sys_message_template
+        <if test="keyWord != null and keyWord != ''">
+            WHERE (
+                message_type LIKE CONCAT('%', #{keyWord}, '%')
+                OR (CASE message_type
+                    <foreach collection="@com.pivothub.commoncore.enums.NotifyMessageType@values()" item="messageType">
+                        WHEN #{messageType.value} THEN #{messageType.name}
+                    </foreach>
+                END) LIKE CONCAT('%', #{keyWord}, '%')
+            )
+        </if>
+        ORDER BY message_type
+    </select>
+
+    <update id="updateContent" parameterType="com.pivothub.pojo.dto.system.notify.MessageTemplateSaveDto">
+        UPDATE sys_message_template
+        SET body_template = #{bodyTemplate},
+            item_template = #{itemTemplate,jdbcType=LONGVARCHAR}
+        WHERE uuid = #{uuid}
+    </update>
+
+    <select id="existsByUuid" resultType="boolean">
+        SELECT EXISTS (SELECT 1 FROM sys_message_template WHERE uuid = #{uuid})
+    </select>
+</mapper>

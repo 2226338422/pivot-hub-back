@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pivothub.system.notify.mapper.SysUserMessageMapper">
+    <sql id="insertColumns">
+        uuid, event_id, user_id, message_type, menu_id, channel, source_id, title, body, delivery_status
+    </sql>
+
+    <insert id="insertBatch">
+        INSERT INTO sys_user_message (<include refid="insertColumns"/>)
+        VALUES
+        <foreach collection="messages" item="message" separator=",">
+            (#{message.uuid}, #{message.eventId}, #{message.userId}, #{message.messageType}, #{message.menuId},
+             #{message.channel}, #{message.sourceId}, #{message.title}, #{message.body}, #{message.deliveryStatus})
+        </foreach>
+        ON DUPLICATE KEY UPDATE uuid = sys_user_message.uuid
+    </insert>
+
+    <select id="selectSucceededUserIds" resultType="string">
+        SELECT user_id
+        FROM sys_user_message
+        WHERE event_id = #{eventId} AND channel = #{channel} AND delivery_status = 1 AND user_id IN
+        <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </select>
+
+    <update id="updateDeliveryStatusBatch">
+        UPDATE sys_user_message
+        SET delivery_status = #{status}
+        WHERE event_id = #{eventId} AND channel = #{channel} AND delivery_status != 1 AND user_id IN
+        <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </update>
+
+    <delete id="deletePendingBatch">
+        DELETE FROM sys_user_message
+        WHERE event_id = #{eventId} AND channel = #{channel} AND delivery_status = 0 AND user_id IN
+        <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </delete>
+</mapper>
