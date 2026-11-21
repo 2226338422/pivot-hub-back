@@ -1,12 +1,18 @@
 package com.pivothub.system.util;
 
 import jakarta.annotation.Resource;
+import jakarta.mail.MessagingException;
+import jakarta.mail.SendFailedException;
+import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.angus.mail.smtp.SMTPMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.mail.MailPreparationException;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -15,7 +21,12 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName: EmailApiUtil
@@ -59,6 +70,35 @@ public class EmailApiUtil {
         // 发送邮件
         mailSender.send(message);
         return true;
+    }
+
+    /** 批量密送同一封纯文本邮件，返回 SMTP 接受的邮箱。  暂时不做图片处理*/
+    public Set<String> sendBccEmail(String subject, String content, List<String> emails) {
+        SMTPMessage message = new SMTPMessage(mailSender.createMimeMessage().getSession());
+        message.setSendPartial(true);
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, StandardCharsets.UTF_8.name());
+            helper.setFrom(from);
+            helper.setBcc(emails.toArray(String[]::new));
+            helper.setSubject(subject);
+            helper.setText(content);
+        } catch (MessagingException failure) {
+            throw new MailPreparationException(failure);
+        }
+        try {
+            mailSender.send(message);
+            return Set.copyOf(emails);
+        } catch (MailSendException failure) {
+            Exception[] messageExceptions = failure.getMessageExceptions();
+            Throwable cause = messageExceptions.length == 0 ? failure.getCause() : messageExceptions[0];
+            if (cause instanceof SendFailedException sendFailure && sendFailure.getValidSentAddresses() != null) {
+                return Arrays.stream(sendFailure.getValidSentAddresses())
+                        .map(InternetAddress.class::cast)
+                        .map(InternetAddress::getAddress)
+                        .collect(Collectors.toSet());
+            }
+            throw failure;
+        }
     }
 
     /**
