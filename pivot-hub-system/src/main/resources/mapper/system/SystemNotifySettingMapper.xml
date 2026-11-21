@@ -38,6 +38,19 @@
         WHERE user_id = #{userId}
     </select>
 
+    <select id="selectEnabledChannelUserIds" resultType="string">
+        SELECT u.uuid
+        FROM sys_user u
+        INNER JOIN sys_notify_setting d
+            ON d.channel = #{channel} AND d.user_id IS NULL AND d.is_default = 1
+        LEFT JOIN sys_notify_setting s
+            ON s.user_id = u.uuid AND s.channel = d.channel AND s.is_default = 0
+        WHERE COALESCE(s.enabled, d.enabled) = 1 AND u.status = 1 AND u.uuid IN
+        <foreach collection="userIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
     <insert id="insert" parameterType="com.pivothub.pojo.po.system.SysNotifySetting">
         INSERT INTO sys_notify_setting
         (uuid, user_id, channel, name, detail, enabled, require_bind, is_default, sort,

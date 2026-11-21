@@ -31,6 +31,15 @@
         FROM sys_user_platform WHERE user_id = #{userId} LIMIT 1
     </select>
 
+    <select id="selectActiveWxpusherByUserIds" resultMap="SysUserPlatformResultMap">
+        SELECT uuid, user_id, wxpusher_uid
+        FROM sys_user_platform
+        WHERE wxpusher_status = 1 AND wxpusher_uid IS NOT NULL AND user_id IN
+        <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </select>
+
     <select id="selectActiveByWxpusherUid" resultMap="SysUserPlatformResultMap">
         SELECT <include refid="platformColumns"/>
         FROM sys_user_platform

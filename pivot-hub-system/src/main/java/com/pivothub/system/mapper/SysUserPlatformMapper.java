@@ -4,9 +4,14 @@ import com.pivothub.pojo.po.system.SysUserPlatform;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 @Mapper
 public interface SysUserPlatformMapper {
     SysUserPlatform selectByUserId(@Param("userId") String userId);
+
+    /** 批量查询指定用户当前生效的 WxPusher 绑定。 */
+    List<SysUserPlatform> selectActiveWxpusherByUserIds(@Param("userIds") List<String> userIds);
 
     /** 查询指定 WxPusher uid 当前生效的绑定（wxpusher_status = 1）。 */
     SysUserPlatform selectActiveByWxpusherUid(@Param("uid") String uid);

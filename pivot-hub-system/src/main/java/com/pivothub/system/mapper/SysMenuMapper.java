@@ -12,4 +12,6 @@ public interface SysMenuMapper {
     List<SysMenu> selectAllMenus();
     List<SysMenu> selectAllMenusForUpdate();
     int countUserMenuAccess(@Param("userId") String userId, @Param("menuCode") String menuCode);
+    /** 从候选用户中筛选有来源菜单权限的活跃用户。 */
+    List<String> selectUserIdsWithMenuAccess(@Param("menuId") String menuId, @Param("userIds") List<String> userIds);
 }

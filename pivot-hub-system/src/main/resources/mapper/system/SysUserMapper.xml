@@ -33,6 +33,15 @@
         FROM sys_user WHERE uuid = #{uuid} LIMIT 1
     </select>
 
+    <select id="selectEmailsByUserIds" resultMap="SysUserResultMap">
+        SELECT uuid, email
+        FROM sys_user
+        WHERE email IS NOT NULL AND uuid IN
+        <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </select>
+
     <insert id="insertUser" parameterType="com.pivothub.pojo.po.system.SysUser">
         INSERT INTO sys_user
         (uuid, code, nickname, email, avatar_file_id, role_id, status, remark,

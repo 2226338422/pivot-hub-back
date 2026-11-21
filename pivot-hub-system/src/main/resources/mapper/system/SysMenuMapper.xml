@@ -50,4 +50,21 @@
             OR (p.person_type = 1 AND p.role_id = u.role_id
                 AND EXISTS (SELECT 1 FROM sys_role r WHERE r.uuid = u.role_id AND r.status = 1)))
     </select>
+    <select id="selectUserIdsWithMenuAccess" resultType="string">
+        SELECT u.uuid
+        FROM sys_user u
+        INNER JOIN sys_menu m ON m.uuid = #{menuId} AND m.status = 1
+        WHERE u.status = 1 AND u.uuid IN
+        <foreach collection="userIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND EXISTS (
+            SELECT 1
+            FROM sys_permission p
+            WHERE p.menu_id = m.uuid AND p.status = 1
+              AND ((p.person_type = 2 AND p.user_id = u.uuid)
+                OR (p.person_type = 1 AND p.role_id = u.role_id
+                    AND EXISTS (SELECT 1 FROM sys_role r WHERE r.uuid = u.role_id AND r.status = 1)))
+        )
+    </select>
 </mapper>

@@ -14,6 +14,10 @@ public interface SystemNotifySettingMapper {
     /** 查询指定用户的设置行。 */
     List<SysNotifySetting> selectByUserId(@Param("userId") String userId);
 
+    /** 批量查询指定渠道有效开关为开启的候选用户。 */
+    List<String> selectEnabledChannelUserIds(@Param("channel") String channel,
+                                           @Param("userIds") List<String> userIds);
+
     int insert(SysNotifySetting record);
 
     int updateEnabled(@Param("userId") String userId,
