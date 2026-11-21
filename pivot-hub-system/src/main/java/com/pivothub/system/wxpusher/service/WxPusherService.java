@@ -2,8 +2,14 @@ package com.pivothub.system.wxpusher.service;
 
 import com.pivothub.pojo.vo.system.wxpusher.WxPusherQrcodeVo;
 
-/** WxPusher 推送绑定。 */
+import java.util.List;
+import java.util.Map;
+
+/** WxPusher 推送绑定和消息发送。 */
 public interface WxPusherService {
+    /** 按用户 UUID 批量发送同一条消息，返回各用户的提交结果，无有效绑定的用户不返回。 */
+    Map<String, Boolean> sendBatchWxPusher(String subject, String content, List<String> userIds);
+
     /** 获取当前用户的绑定二维码链接（未绑定时创建）。 */
     WxPusherQrcodeVo qrcode();
 

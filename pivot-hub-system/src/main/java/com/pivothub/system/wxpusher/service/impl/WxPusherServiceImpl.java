@@ -13,6 +13,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /** WxPusher 推送绑定与消息发送实现，绑定信息落 sys_user_platform 表。 */
 @Service
@@ -24,6 +30,34 @@ public class WxPusherServiceImpl implements WxPusherService {
 
     @Autowired
     private SysUserPlatformMapper platformMapper;
+
+    @Override
+    public Map<String, Boolean> sendBatchWxPusher(String subject, String content, List<String> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            return Map.of();
+        }
+        List<SysUserPlatform> recipients = platformMapper.selectActiveWxpusherByUserIds(userIds).stream()
+                .filter(platform -> StringUtils.hasText(platform.getWxpusherUid()))
+                .toList();
+        if (recipients.isEmpty()) {
+            return Map.of();
+        }
+        List<String> uids = recipients.stream().map(SysUserPlatform::getWxpusherUid).distinct().toList();
+        String messageContent = subject + "\n\n" + content;
+        Set<String> accepted;
+        try {
+            accepted = client.sendBatchMessage(uids, messageContent);
+        } catch (RuntimeException failure) {
+            LOG.warn("WxPusher 提交失败 recipientCount={} errorType={}", uids.size(),
+                    failure.getClass().getSimpleName());
+            accepted = Set.of();
+        }
+        Map<String, Boolean> results = new HashMap<>();
+        for (SysUserPlatform recipient : recipients) {
+            results.put(recipient.getUserId(), accepted.contains(recipient.getWxpusherUid()));
+        }
+        return results;
+    }
 
     @Override
     public WxPusherQrcodeVo qrcode() {

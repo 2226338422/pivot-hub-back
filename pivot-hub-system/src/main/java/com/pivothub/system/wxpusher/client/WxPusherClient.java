@@ -1,6 +1,7 @@
 package com.pivothub.system.wxpusher.client;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.pivothub.common.exception.BusinessException;
 import com.pivothub.pojo.vo.system.wxpusher.WxPusherQrcodeVo;
@@ -14,9 +15,11 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * WxPusher 服务端接口客户端，负责发送消息与创建参数二维码。
@@ -31,20 +34,35 @@ public class WxPusherClient {
     @Autowired
     private RestTemplate restTemplate;
 
-    /** 给指定 uid 用户发送自定义消息，content 支持 Markdown（contentType=3）。 */
-    public void sendMessage(String uid, String content) {
+    /** 在一次请求中提交同一条消息，返回平台已受理的 UID。 */
+    public Set<String> sendBatchMessage(List<String> uids, String content) {
         ensureConfigured();
         Map<String, Object> body = new HashMap<>();
         body.put("appToken", properties.getAppToken());
         body.put("content", content);
         body.put("summary", content.length() > 20 ? content.substring(0, 20) : content);
         body.put("contentType", 3);
-        body.put("uids", Collections.singletonList(uid));
+        body.put("uids", uids);
         JSONObject resp = post(properties.getSendUrl(), body);
         if (resp == null || resp.getInteger("code") == null || resp.getInteger("code") != 1000) {
             String msg = resp == null ? "未知错误" : resp.getString("msg");
             throw new BusinessException(502, "WxPusher 发送失败：" + msg);
         }
+        if (!(resp.get("data") instanceof JSONArray targets)) {
+            throw new BusinessException(502, "WxPusher 未返回收件人受理结果");
+        }
+        Set<String> requested = new HashSet<>(uids);
+        Set<String> accepted = new HashSet<>();
+        for (int index = 0; index < targets.size(); index++) {
+            JSONObject target = targets.getJSONObject(index);
+            if (target != null && Integer.valueOf(1000).equals(target.getInteger("code"))) {
+                String uid = target.getString("uid");
+                if (requested.contains(uid)) {
+                    accepted.add(uid);
+                }
+            }
+        }
+        return accepted;
     }
 
     /** 创建带参数二维码，extra 携带业务标识（用户uuid），返回二维码地址与关注短链接。 */
