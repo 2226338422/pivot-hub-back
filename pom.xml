@@ -49,7 +49,7 @@
         <nacos-starter.version>2023.0.3.4</nacos-starter.version>
         <swagger.version>2.2.22</swagger.version>
         <easyexcel.version>3.3.3</easyexcel.version>
-        <rocketmq-spring-boot-starter.version>2.3.4</rocketmq-spring-boot-starter.version>
+        <rocketmq-spring-boot-starter.version>2.3.5</rocketmq-spring-boot-starter.version>
     </properties>
 
     <dependencyManagement>
