@@ -242,3 +242,47 @@ CREATE TABLE IF NOT EXISTS sys_announcement_file (
     UNIQUE KEY uk_sys_announcement_file (announcement_id, file_id),
     KEY idx_sys_announcement_file_sort (announcement_id, sort, uuid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='公告附件关联表';
+
+CREATE TABLE IF NOT EXISTS sys_message_subscription (
+    uuid         VARCHAR(32)  NOT NULL PRIMARY KEY COMMENT '主键',
+    user_id      VARCHAR(32)  NULL COMMENT '用户 UUID，NULL 表示全局默认',
+    message_type VARCHAR(32)  NOT NULL COMMENT '消息类型应用编码，如 public_push、typhoon_forecast',
+    menu_id      VARCHAR(32)  NOT NULL COMMENT '来源菜单 UUID，关联 sys_menu.uuid',
+    name         VARCHAR(64)  NULL COMMENT '订阅名称，由默认行提供',
+    detail       VARCHAR(256) NULL COMMENT '订阅说明，由默认行提供',
+    enabled      TINYINT      NOT NULL DEFAULT 0 COMMENT '0-关闭 1-开启',
+    is_default   TINYINT      NOT NULL DEFAULT 0 COMMENT '0-用户设置 1-全局默认',
+    sort         INT          NOT NULL DEFAULT 0 COMMENT '展示顺序，由默认行提供',
+    create_time  DATETIME     NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time  DATETIME     NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    UNIQUE KEY uk_sys_message_subscription_user_type (user_id, message_type),
+    KEY idx_sys_message_subscription_type (message_type, is_default, enabled)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='消息订阅设置表';
+
+CREATE TABLE IF NOT EXISTS sys_user_message (
+    uuid            VARCHAR(32)  NOT NULL PRIMARY KEY COMMENT '主键',
+    event_id        VARCHAR(32)  NOT NULL COMMENT '消息事件 ID，MQ 重投时保持不变',
+    user_id         VARCHAR(32)  NOT NULL COMMENT '接收用户 UUID',
+    message_type    VARCHAR(32)  NOT NULL COMMENT '消息类型',
+    menu_id         VARCHAR(32)  NOT NULL COMMENT '来源菜单 UUID，关联 sys_menu.uuid',
+    channel         VARCHAR(32)  NOT NULL COMMENT '渠道：inbox、email、wxpusher',
+    source_id       VARCHAR(64)  NULL COMMENT '来源业务 ID，如公告 UUID 或台风 ID',
+    title           VARCHAR(200) NOT NULL COMMENT '消息标题',
+    body            TEXT         NOT NULL COMMENT '消息正文',
+    delivery_status TINYINT      NOT NULL DEFAULT 0 COMMENT '0-待投递 1-成功 2-失败',
+    read_time       DATETIME     NULL COMMENT '站内信阅读时间，NULL 表示未读',
+    create_time     DATETIME     NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time     DATETIME     NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    UNIQUE KEY uk_sys_user_message_event_user_channel (event_id, user_id, channel),
+    KEY idx_sys_user_message_inbox (user_id, channel, delivery_status, create_time, uuid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户消息与渠道投递记录表';
+
+CREATE TABLE IF NOT EXISTS sys_message_template (
+    uuid          VARCHAR(32) NOT NULL PRIMARY KEY COMMENT '主键',
+    message_type  VARCHAR(32) NOT NULL COMMENT '消息类型应用编码，如 public_push、typhoon_forecast',
+    body_template TEXT        NOT NULL COMMENT '正文模板，支持占位符',
+    item_template TEXT        NULL COMMENT '单条明细模板，用于生成多行内容',
+    create_time   DATETIME    NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time   DATETIME    NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    UNIQUE KEY uk_sys_message_template_type (message_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='消息模板表';
