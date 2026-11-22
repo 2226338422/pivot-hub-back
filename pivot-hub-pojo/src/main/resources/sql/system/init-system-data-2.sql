@@ -26,16 +26,16 @@ WHERE parent.uuid = (
   );
 
 -- ==================== sys_message_subscription ====================
--- 公告推送和台风预测的默认订阅按来源菜单编码关联，初始关闭。
+-- 默认订阅按来源菜单编码关联，公告推送默认开启，台风预测默认关闭。
 INSERT INTO sys_message_subscription
     (uuid, user_id, message_type, menu_id, name, detail, enabled, is_default, sort)
 SELECT REPLACE(UUID(), '-', ''), NULL, seed.message_type, menu.uuid, seed.name, seed.detail,
-       0, 1, seed.sort
+       seed.enabled, 1, seed.sort
 FROM (
     SELECT 'public_push' AS message_type, 'notice_list' AS menu_code,
-           '公告推送' AS name, '接收新公告发布通知' AS detail, 1 AS sort
+           '公告推送' AS name, '接收新公告发布通知' AS detail, 1 AS enabled, 1 AS sort
     UNION ALL
-    SELECT 'typhoon_forecast', 'map_typhoon', '台风预测', '接收台风预报更新通知', 2
+    SELECT 'typhoon_forecast', 'map_typhoon', '台风预测', '接收台风预报更新通知', 0, 2
 ) seed
 INNER JOIN sys_menu menu ON menu.uuid = (
     SELECT MIN(candidate.uuid)
@@ -56,12 +56,12 @@ INSERT INTO sys_message_template (uuid, message_type, body_template, item_templa
 SELECT REPLACE(UUID(), '-', ''), seed.message_type, seed.body_template, seed.item_template
 FROM (
     SELECT 'public_push' AS message_type,
-           CONCAT('新公告已发布。', CHAR(10), CHAR(10), '{announcement_content}') AS body_template,
+           '{arg_1}' AS body_template,
            NULL AS item_template
     UNION ALL
     SELECT 'typhoon_forecast',
-           CONCAT('预计有 {taifeng_count} 个台风可能影响本地区，请注意防范。', CHAR(10), CHAR(10), '{taifeng_items}'),
-           '- 台风「{taifeng_name}」预计于 {yuce_datetime} 影响本地区。'
+           CONCAT('预计有 {arg_1} 个台风可能影响本地区，请注意防范。', CHAR(10), CHAR(10), '{arg_2}'),
+           '- 台风「{arg_1}」预计于 {arg_2} 影响本地区。'
 ) seed
 WHERE NOT EXISTS (
     SELECT 1 FROM sys_message_template existing
