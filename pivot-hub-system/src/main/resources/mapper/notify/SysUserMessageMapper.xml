@@ -1,6 +1,65 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pivothub.system.notify.mapper.SysUserMessageMapper">
+    <sql id="inboxColumns">
+        uuid, message_type AS messageType, menu_id AS menuId, channel, source_id AS sourceId,
+        title, body, read_time AS readTime, create_time AS createTime
+    </sql>
+
+    <sql id="inboxScope">
+        user_id = #{userId} AND channel = #{inboxChannel} AND delivery_status = 1
+    </sql>
+
+    <select id="selectInboxPage" resultType="com.pivothub.pojo.vo.system.notify.InboxMessageVo">
+        SELECT <include refid="inboxColumns"/>
+        FROM sys_user_message
+        WHERE <include refid="inboxScope"/>
+        <if test="query.messageTypes != null and !query.messageTypes.isEmpty()">
+            AND message_type IN
+            <foreach collection="query.messageTypes" item="messageType" open="(" separator="," close=")">
+                #{messageType}
+            </foreach>
+        </if>
+        <if test="query.read != null">
+            <choose>
+                <when test="query.read">AND read_time IS NOT NULL</when>
+                <otherwise>AND read_time IS NULL</otherwise>
+            </choose>
+        </if>
+        <if test="query.createTimeStart != null">
+            AND create_time &gt;= #{query.createTimeStart}
+        </if>
+        <if test="query.createTimeEnd != null">
+            AND create_time &lt;= #{query.createTimeEnd}
+        </if>
+        ORDER BY
+        <choose>
+            <when test="query.createTimeOrder == 1">create_time ASC, uuid ASC</when>
+            <otherwise>create_time DESC, uuid DESC</otherwise>
+        </choose>
+    </select>
+
+    <select id="selectInboxDetail" resultType="com.pivothub.pojo.vo.system.notify.InboxMessageVo">
+        SELECT <include refid="inboxColumns"/>
+        FROM sys_user_message
+        WHERE <include refid="inboxScope"/> AND uuid = #{uuid}
+    </select>
+
+    <update id="markInboxRead">
+        UPDATE sys_user_message
+        SET read_time = CURRENT_TIMESTAMP
+        WHERE <include refid="inboxScope"/> AND read_time IS NULL AND uuid IN
+        <foreach collection="uuids" item="uuid" open="(" separator="," close=")">
+            #{uuid}
+        </foreach>
+    </update>
+
+    <update id="markAllInboxRead">
+        UPDATE sys_user_message
+        SET read_time = CURRENT_TIMESTAMP
+        WHERE <include refid="inboxScope"/> AND read_time IS NULL
+    </update>
+
     <sql id="insertColumns">
         uuid, event_id, user_id, message_type, menu_id, channel, source_id, title, body, delivery_status
     </sql>
