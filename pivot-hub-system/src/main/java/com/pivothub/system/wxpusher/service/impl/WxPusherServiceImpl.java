@@ -43,10 +43,9 @@ public class WxPusherServiceImpl implements WxPusherService {
             return Map.of();
         }
         List<String> uids = recipients.stream().map(SysUserPlatform::getWxpusherUid).distinct().toList();
-        String messageContent = subject + "\n\n" + content;
         Set<String> accepted;
         try {
-            accepted = client.sendBatchMessage(uids, messageContent);
+            accepted = client.sendBatchMessage(uids, subject, content);
         } catch (RuntimeException failure) {
             LOG.warn("WxPusher 提交失败 recipientCount={} errorType={}", uids.size(),
                     failure.getClass().getSimpleName());

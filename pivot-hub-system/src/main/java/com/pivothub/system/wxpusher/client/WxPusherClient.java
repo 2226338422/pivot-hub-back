@@ -35,12 +35,12 @@ public class WxPusherClient {
     private RestTemplate restTemplate;
 
     /** 在一次请求中提交同一条消息，返回平台已受理的 UID。 */
-    public Set<String> sendBatchMessage(List<String> uids, String content) {
+    public Set<String> sendBatchMessage(List<String> uids, String summary, String content) {
         ensureConfigured();
         Map<String, Object> body = new HashMap<>();
         body.put("appToken", properties.getAppToken());
         body.put("content", content);
-        body.put("summary", content.length() > 20 ? content.substring(0, 20) : content);
+        body.put("summary", summary);
         body.put("contentType", 3);
         body.put("uids", uids);
         JSONObject resp = post(properties.getSendUrl(), body);
