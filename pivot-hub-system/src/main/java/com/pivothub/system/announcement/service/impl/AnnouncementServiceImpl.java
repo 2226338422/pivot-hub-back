@@ -4,10 +4,13 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.pivothub.common.exception.SystemException;
+import com.pivothub.common.notify.template.MessageTemplateRenderer;
 import com.pivothub.commoncore.enums.FileType;
+import com.pivothub.commoncore.enums.NotifyMessageType;
 import com.pivothub.pojo.dto.system.announcement.AnnouncementPageDto;
 import com.pivothub.pojo.dto.system.announcement.AnnouncementFeedQueryDto;
 import com.pivothub.pojo.dto.system.announcement.AnnouncementSaveDto;
+import com.pivothub.pojo.dto.system.notify.NotifyEventDto;
 import com.pivothub.pojo.po.system.SysAnnouncement;
 import com.pivothub.pojo.po.system.SysAnnouncementFile;
 import com.pivothub.pojo.po.system.SysFile;
@@ -20,8 +23,12 @@ import com.pivothub.system.announcement.mapper.SysAnnouncementFileMapper;
 import com.pivothub.system.announcement.mapper.SysAnnouncementMapper;
 import com.pivothub.system.announcement.service.AnnouncementService;
 import com.pivothub.system.mapper.SysFileMapper;
+import com.pivothub.system.notify.service.MessageTemplateService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -35,6 +42,7 @@ import java.util.Set;
 
 @Service
 public class AnnouncementServiceImpl implements AnnouncementService {
+    private static final Logger LOG = LoggerFactory.getLogger(AnnouncementServiceImpl.class);
     private static final long MAX_ANNOUNCEMENT_IMAGE_BYTES = 5L * 1024 * 1024;
 
     @Autowired
@@ -45,6 +53,12 @@ public class AnnouncementServiceImpl implements AnnouncementService {
 
     @Autowired
     private SysFileMapper sysFileMapper;
+
+    @Autowired
+    private MessageTemplateService messageTemplateService;
+
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public AnnouncementFeedVo feedPublished(AnnouncementFeedQueryDto query) {
@@ -153,6 +167,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
         if (sysAnnouncementMapper.publish(id, operatorId) != 1) {
             throw new SystemException(409, "公告状态已变化，请刷新后重试");
         }
+        publishAnnouncementEvent(announcement);
     }
 
     @Override
@@ -166,6 +181,26 @@ public class AnnouncementServiceImpl implements AnnouncementService {
         if (sysAnnouncementMapper.withdraw(id, operatorId) != 1) {
             throw new SystemException(409, "公告状态已变化，请刷新后重试");
         }
+    }
+
+    /** 生成通知内容并发布公告事件。 */
+    private void publishAnnouncementEvent(SysAnnouncement announcement) {
+        String announcementId = announcement.getUuid();
+        NotifyEventDto event = new NotifyEventDto();
+        try {
+            String messageType = NotifyMessageType.ANNOUNCEMENT.getValue();
+            String template = messageTemplateService.find(messageType).getBodyTemplate();
+            String body = MessageTemplateRenderer.render(template, announcement.getContent());
+            event.setMessageType(messageType);
+            event.setSourceId(announcementId);
+            event.setTitle(announcement.getTitle());
+            event.setBody(body);
+        } catch (RuntimeException failure) {
+            LOG.warn("准备公告通知失败 announcementId={}", announcementId, failure);
+            return;
+        }
+
+        applicationEventPublisher.publishEvent(event);
     }
 
     /** 批量查询公告图片关联并写入展示对象。 */
