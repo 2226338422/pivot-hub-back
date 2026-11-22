@@ -2,6 +2,7 @@ package com.pivothub.system.notify.controller;
 
 import com.pivothub.common.result.Result;
 import com.pivothub.pojo.dto.system.notify.MessageSubscriptionSaveDto;
+import com.pivothub.pojo.vo.SelectOptionVo;
 import com.pivothub.pojo.vo.system.notify.MessageSubscriptionVo;
 import com.pivothub.system.annotation.MenuPermission;
 import com.pivothub.system.notify.service.MessageSubscriptionService;
@@ -23,6 +24,13 @@ import java.util.List;
 public class MessageSubscriptionController {
     @Autowired
     private MessageSubscriptionService messageSubscriptionService;
+
+    /** 查询消息类型选项。 */
+    @Operation(summary = "查询消息类型选项")
+    @GetMapping("/message-types")
+    public Result<List<SelectOptionVo>> messageTypes() {
+        return Result.success(messageSubscriptionService.listMessageTypeOptions());
+    }
 
     @Operation(summary = "查询当前用户的消息订阅")
     @GetMapping

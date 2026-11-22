@@ -7,6 +7,7 @@ import com.pivothub.commoncore.enums.NotifyMessageType;
 import com.pivothub.pojo.dto.system.notify.MessageSubscriptionSaveDto;
 import com.pivothub.pojo.po.system.SysMenu;
 import com.pivothub.pojo.po.system.SysMessageSubscription;
+import com.pivothub.pojo.vo.SelectOptionVo;
 import com.pivothub.pojo.vo.system.notify.MessageSubscriptionVo;
 import com.pivothub.system.mapper.SysMenuMapper;
 import com.pivothub.system.notify.mapper.SysMessageSubscriptionMapper;
@@ -25,6 +26,11 @@ public class MessageSubscriptionServiceImpl implements MessageSubscriptionServic
 
     @Autowired
     private SysMenuMapper sysMenuMapper;
+
+    @Override
+    public List<SelectOptionVo> listMessageTypeOptions() {
+        return sysMessageSubscriptionMapper.selectDefaultOptions();
+    }
 
     @Override
     public List<MessageSubscriptionVo> list() {
