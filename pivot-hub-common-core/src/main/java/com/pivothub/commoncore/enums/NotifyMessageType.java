@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 /** 可订阅的业务消息类型。 */
 public enum NotifyMessageType implements ValueEnum<String> {
-    ANNOUNCEMENT("public_push", "公共推送"),
+    ANNOUNCEMENT("public_push", "公告推送"),
     TYPHOON("typhoon_forecast", "台风预测");
 
     private final String value;

@@ -26,14 +26,14 @@ WHERE parent.uuid = (
   );
 
 -- ==================== sys_message_subscription ====================
--- 公共推送和台风预测的默认订阅按来源菜单编码关联，初始关闭。
+-- 公告推送和台风预测的默认订阅按来源菜单编码关联，初始关闭。
 INSERT INTO sys_message_subscription
     (uuid, user_id, message_type, menu_id, name, detail, enabled, is_default, sort)
 SELECT REPLACE(UUID(), '-', ''), NULL, seed.message_type, menu.uuid, seed.name, seed.detail,
        0, 1, seed.sort
 FROM (
     SELECT 'public_push' AS message_type, 'notice_list' AS menu_code,
-           '公共推送' AS name, '接收新公告发布通知' AS detail, 1 AS sort
+           '公告推送' AS name, '接收新公告发布通知' AS detail, 1 AS sort
     UNION ALL
     SELECT 'typhoon_forecast', 'map_typhoon', '台风预测', '接收台风预报更新通知', 2
 ) seed
@@ -51,7 +51,7 @@ WHERE NOT EXISTS (
 );
 
 -- ==================== sys_message_template ====================
--- 初始化公共推送和台风预测模板，保留已有模板的内容。
+-- 初始化公告推送和台风预测模板，保留已有模板的内容。
 INSERT INTO sys_message_template (uuid, message_type, body_template, item_template)
 SELECT REPLACE(UUID(), '-', ''), seed.message_type, seed.body_template, seed.item_template
 FROM (
