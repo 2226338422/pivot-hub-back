@@ -38,6 +38,12 @@
         LEFT JOIN sys_message_subscription s
             ON s.user_id = u.uuid AND s.message_type = #{messageType} AND s.is_default = 0
         WHERE u.status = 1 AND COALESCE(s.enabled, #{defaultEnabled}) = 1
+        <if test="candidateUserIds != null">
+            AND u.uuid IN
+            <foreach collection="candidateUserIds" item="userId" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
         ORDER BY u.uuid
     </select>
 </mapper>

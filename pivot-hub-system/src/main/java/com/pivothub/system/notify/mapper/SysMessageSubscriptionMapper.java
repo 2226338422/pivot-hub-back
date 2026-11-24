@@ -23,7 +23,8 @@ public interface SysMessageSubscriptionMapper {
     /** 新增或更新用户对指定类型的设置。 */
     int upsertUserSetting(SysMessageSubscription subscription);
 
-    /** 查询已订阅的全部活跃用户 UUID。 */
+    /** 查询已订阅的活跃用户 UUID，可限定候选名单。 */
     List<String> selectSubscribedUserIds(@Param("messageType") String messageType,
-                                         @Param("defaultEnabled") Integer defaultEnabled);
+                                         @Param("defaultEnabled") Integer defaultEnabled,
+                                         @Param("candidateUserIds") List<String> candidateUserIds);
 }

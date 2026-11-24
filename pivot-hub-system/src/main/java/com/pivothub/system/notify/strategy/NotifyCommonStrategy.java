@@ -65,25 +65,23 @@ public abstract class NotifyCommonStrategy implements NotifyChannelStrategy, Roc
             throw new IllegalStateException("通知类型缺少默认订阅配置");
         }
         event.setMenuId(defaults.getMenuId());
-        //处理指定收件人，如果有，直接跳过后面的查询收件人
         List<String> specifiedIds = event.getReceiverUserIds();
-        if (specifiedIds != null && !specifiedIds.isEmpty()) {
-            event.setReceiverUserIds(new ArrayList<>(new LinkedHashSet<>(specifiedIds)));
-            return true;
-        }
+        List<String> candidates = specifiedIds == null || specifiedIds.isEmpty()
+                ? null
+                : new ArrayList<>(new LinkedHashSet<>(specifiedIds));
         //处理收件人
         //查谁订阅了这类消息
         List<String> subscribedUsers = sysMessageSubscriptionMapper.selectSubscribedUserIds(
-                defaults.getMessageType(), defaults.getEnabled());
+                defaults.getMessageType(), defaults.getEnabled(), candidates);
         if (subscribedUsers.isEmpty()) {
-            event.setReceiverUserIds(List.of());
+            event.setReceiverUserIds(new ArrayList<>());
             return false;
         }
         //查订阅用户里谁有来源菜单权限
         List<String> permittedUsers = sysMenuMapper.selectUserIdsWithMenuAccess(defaults.getMenuId(), subscribedUsers);
         //查有权限的人里谁开启了当前渠道
         List<String> userIds = permittedUsers.isEmpty()
-                ? List.of()
+                ? new ArrayList<>()
                 : systemNotifySettingMapper.selectEnabledChannelUserIds(channel(), permittedUsers);
         event.setReceiverUserIds(userIds);
         return !userIds.isEmpty();
