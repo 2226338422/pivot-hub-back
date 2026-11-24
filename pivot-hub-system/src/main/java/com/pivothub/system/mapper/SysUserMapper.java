@@ -1,6 +1,7 @@
 package com.pivothub.system.mapper;
 
 import com.pivothub.pojo.po.system.SysUser;
+import com.pivothub.pojo.vo.system.UserProvinceVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -14,6 +15,9 @@ public interface SysUserMapper {
 
     /** 批量查询指定用户的邮箱。 */
     List<SysUser> selectEmailsByUserIds(@Param("userIds") List<String> userIds);
+
+    /** 查询已启用账号的用户 UUID 和省份编码列表。 */
+    List<UserProvinceVo> selectUserProvinces();
 
     int insertUser(SysUser user);
 

@@ -6,6 +6,7 @@ import com.pivothub.commoncore.constants.redis.SystemRedisConstants;
 import com.pivothub.commoncore.util.CacheUtil;
 import com.pivothub.pojo.po.system.SysUser;
 import com.pivothub.pojo.vo.system.UserInfoVo;
+import com.pivothub.pojo.vo.system.UserProvinceVo;
 import com.pivothub.system.file.service.FileService;
 import com.pivothub.system.mapper.SysUserMapper;
 import com.pivothub.system.service.MailCodeService;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -30,6 +33,11 @@ public class UserProfileServiceImpl implements UserProfileService {
     private FileService fileService;
     @Autowired
     private MailCodeService mailCodeService;
+
+    @Override
+    public List<UserProvinceVo> listUserProvinces() {
+        return mapper.selectUserProvinces();
+    }
 
     @Override
     public SysUser getUser(String userId) {
@@ -52,6 +60,9 @@ public class UserProfileServiceImpl implements UserProfileService {
         }
         UserInfoVo profile = new UserInfoVo();
         BeanUtils.copyProperties(user, profile);
+        if (profile.getProvinceCodes() == null) {
+            profile.setProvinceCodes(new ArrayList<>());
+        }
         fillDefaultAvatar(profile);
         cacheUtil.setObject(SystemRedisConstants.USER_PROFILE_KEY_PREFIX + userId, profile,
                 PROFILE_TTL_HOURS, TimeUnit.HOURS);

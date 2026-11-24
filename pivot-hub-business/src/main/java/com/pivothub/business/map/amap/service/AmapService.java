@@ -1,5 +1,6 @@
 package com.pivothub.business.map.amap.service;
 
+import com.pivothub.pojo.vo.SelectOptionVo;
 import com.pivothub.pojo.dto.business.map.amap.AmapCoordinateDto;
 import com.pivothub.pojo.dto.business.map.amap.AmapPoiIdDto;
 import com.pivothub.pojo.dto.business.map.amap.AmapPoiPageDto;
@@ -35,6 +36,9 @@ public interface AmapService {
      * @return 服务可提供的城市及县级市选项列表
      */
     List<MapCityOptionVo> cities(String operatorId);
+
+    /** 查询高德省级行政区编码和名称。 */
+    List<SelectOptionVo> provinceOptions(String operatorId);
 
     /**
      * @Description: 按关键词和可选城市条件查询地址输入提示

@@ -11,6 +11,8 @@
         <result column="avatar_file_id" property="avatarFileId"/>
         <result column="role_id" property="roleId"/>
         <result column="status" property="status"/>
+        <result column="province_codes" property="provinceCodes"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
         <result column="remark" property="remark"/>
         <result column="create_user_id" property="createUserId"/>
         <result column="update_user_id" property="updateUserId"/>
@@ -18,8 +20,14 @@
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
+    <resultMap id="UserProvinceMap" type="com.pivothub.pojo.vo.system.UserProvinceVo">
+        <id column="uuid" property="userId"/>
+        <result column="province_codes" property="provinceCodes"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+    </resultMap>
+
     <sql id="userColumns">
-        uuid, code, nickname, email, avatar_file_id, role_id, status, remark,
+        uuid, code, nickname, email, avatar_file_id, role_id, status, province_codes, remark,
         create_user_id, update_user_id, create_time, update_time
     </sql>
 
@@ -42,6 +50,13 @@
         </foreach>
     </select>
 
+    <select id="selectUserProvinces" resultMap="UserProvinceMap">
+        SELECT uuid, COALESCE(province_codes, JSON_ARRAY()) AS province_codes
+        FROM sys_user
+        WHERE status = 1
+        ORDER BY uuid
+    </select>
+
     <insert id="insertUser" parameterType="com.pivothub.pojo.po.system.SysUser">
         INSERT INTO sys_user
         (uuid, code, nickname, email, avatar_file_id, role_id, status, remark,
@@ -54,6 +69,9 @@
     <update id="updateProfile" parameterType="com.pivothub.pojo.po.system.SysUser">
         UPDATE sys_user
         SET nickname = #{nickname}, avatar_file_id = #{avatarFileId}, remark = #{remark},
+            <if test="provinceCodes != null">
+                province_codes = #{provinceCodes,typeHandler=com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler},
+            </if>
             update_user_id = #{updateUserId}
         WHERE uuid = #{uuid}
     </update>

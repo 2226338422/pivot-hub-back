@@ -6,6 +6,8 @@ import com.pivothub.pojo.po.BasePo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 /**
  * @Description: 用户实体
  * @Author lhb
@@ -36,6 +38,9 @@ public class SysUser extends BasePo {
 
     /** 状态 0-禁用 1-正常 */
     private Integer status;
+
+    /** 所在省份的省级行政区划代码。 */
+    private List<String> provinceCodes;
 
     /** 备注 */
     private String remark;

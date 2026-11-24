@@ -1,5 +1,6 @@
 package com.pivothub.business.map.amap.service.impl;
 
+import com.pivothub.pojo.vo.SelectOptionVo;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -145,6 +146,32 @@ public class AmapServiceImpl implements AmapService {
         if (!node.isTextual() && !node.isIntegralNumber()) return null;
         String value = node.asText();
         return value.matches("[1-9][0-9]{5}") ? value : null;
+    }
+
+
+    @Override
+    public List<SelectOptionVo> provinceOptions(String operatorId) {
+        JsonNode root = get(Endpoint.DISTRICTS,
+                Map.of("keywords", "100000", "subdistrict", "1", "extensions", "base"), operatorId);
+        Map<String, String> provinces = new TreeMap<>();
+        for (JsonNode country : array(root.path("districts"))) {
+            if (!"100000".equals(districtAdcode(country.path("adcode")))) {
+                continue;
+            }
+            for (JsonNode province : array(country.path("districts"))) {
+                String code = districtAdcode(province.path("adcode"));
+                String name = districtName(province.path("name"));
+                if ("province".equals(province.path("level").asText()) && code != null && name != null) {
+                    provinces.putIfAbsent(code, name);
+                }
+            }
+        }
+        if (provinces.isEmpty()) {
+            throw unavailable();
+        }
+        return provinces.entrySet().stream()
+                .map(province -> new SelectOptionVo(province.getKey(), province.getValue()))
+                .toList();
     }
 
     @Override public List<SearchTipVo> searchTips(AmapSearchRequestDto request, String operatorId) {

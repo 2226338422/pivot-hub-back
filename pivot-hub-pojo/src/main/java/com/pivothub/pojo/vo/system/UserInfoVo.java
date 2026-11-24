@@ -1,7 +1,10 @@
 package com.pivothub.pojo.vo.system;
 
-import lombok.Data;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Schema(description = "当前用户资料")
@@ -20,6 +23,8 @@ public class UserInfoVo {
     private String roleId;
     @Schema(description = "用户状态：1-启用，0-禁用")
     private Integer status;
+    @Schema(description = "所在省份的省级行政区划代码")
+    private List<String> provinceCodes = new ArrayList<>();
     @Schema(description = "备注")
     private String remark;
 }
