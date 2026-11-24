@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS sys_config (
     config_key     VARCHAR(100) NOT NULL COMMENT '配置键',
     config_value   TEXT         NULL COMMENT '配置值',
     config_name    VARCHAR(100) NULL COMMENT '配置名称',
-    config_type    TINYINT      NULL COMMENT '类型 1-文本 2-JSON 3-加密',
+    config_type    TINYINT      NULL COMMENT '表单类型 1-文本 2-开关 3-整数 4-小数 5-单选 6-多选',
     status         TINYINT      NOT NULL DEFAULT 1 COMMENT '状态 0-禁用 1-正常',
     remark         VARCHAR(500) NULL COMMENT '备注',
     create_user_id VARCHAR(32)  NULL COMMENT '创建人uuid',
@@ -117,7 +117,8 @@ CREATE TABLE IF NOT EXISTS sys_operation_log (
 CREATE TABLE IF NOT EXISTS sys_permission (
     uuid           VARCHAR(32)  NOT NULL PRIMARY KEY COMMENT '主键',
     name           VARCHAR(100) NULL COMMENT '权限名称',
-    menu_id        VARCHAR(32)  NOT NULL COMMENT '菜单uuid',
+    menu_id        VARCHAR(32)  NULL COMMENT '菜单uuid',
+    config_id      VARCHAR(32)  NULL COMMENT '系统配置uuid，关联 sys_config.uuid',
     role_id        VARCHAR(32)  NULL COMMENT '角色uuid',
     user_id        VARCHAR(32)  NULL COMMENT '用户uuid',
     person_type    TINYINT      NOT NULL COMMENT '归属类型 1-角色 2-用户',
@@ -127,6 +128,7 @@ CREATE TABLE IF NOT EXISTS sys_permission (
     create_time    DATETIME     NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time    DATETIME     NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     KEY idx_sys_permission_menu_id (menu_id),
+    KEY idx_sys_permission_config_id (config_id),
     KEY idx_sys_permission_role_id (role_id),
     KEY idx_sys_permission_user_id (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统权限表';

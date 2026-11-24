@@ -20,13 +20,13 @@ public class SysConfig extends BasePo {
     /** 配置键，唯一 */
     private String configKey;
 
-    /** 配置值（敏感值 AES 加密） */
+    /** 配置值，按文本保存 */
     private String configValue;
 
     /** 配置名称 */
     private String configName;
 
-    /** 类型 1-文本 2-JSON 3-加密 */
+    /** 表单类型 1-文本 2-开关 3-整数 4-小数 5-单选 6-多选 */
     private Integer configType;
 
     /** 状态 0-禁用 1-正常 */

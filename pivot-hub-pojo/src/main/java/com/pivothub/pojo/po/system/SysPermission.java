@@ -23,6 +23,9 @@ public class SysPermission extends BasePo {
     /** 菜单uuid */
     private String menuId;
 
+    /** 系统配置uuid */
+    private String configId;
+
     /** 角色uuid */
     private String roleId;
 
