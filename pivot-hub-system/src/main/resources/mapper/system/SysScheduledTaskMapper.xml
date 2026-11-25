@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pivothub.system.mapper.SysScheduledTaskMapper">
+    <resultMap id="TaskMap" type="com.pivothub.pojo.po.system.SysScheduledTask">
+        <id column="uuid" property="uuid"/>
+        <result column="task_code" property="taskCode"/>
+        <result column="task_name" property="taskName"/>
+        <result column="service_name" property="serviceName"/>
+        <result column="cron" property="cron"/>
+        <result column="status" property="status"/>
+        <result column="sort" property="sort"/>
+        <result column="remark" property="remark"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="update_user_id" property="updateUserId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <resultMap id="TaskListMap" type="com.pivothub.pojo.vo.system.ScheduledTaskVo">
+        <id column="uuid" property="uuid"/>
+        <result column="task_code" property="taskCode"/>
+        <result column="task_name" property="taskName"/>
+        <result column="service_name" property="serviceName"/>
+        <result column="cron" property="cron"/>
+        <result column="status" property="status"/>
+        <result column="sort" property="sort"/>
+        <result column="remark" property="remark"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="latest_run_status" property="latestRunStatus"/>
+        <result column="latest_result_summary" property="latestResultSummary"/>
+        <result column="latest_started_time" property="latestStartedTime"/>
+        <result column="latest_finished_time" property="latestFinishedTime"/>
+    </resultMap>
+
+    <resultMap id="TaskDefinitionMap" type="com.pivothub.pojo.vo.system.ScheduledTaskDefinitionVo">
+        <id column="uuid" property="uuid"/>
+        <result column="task_code" property="taskCode"/>
+        <result column="task_name" property="taskName"/>
+        <result column="service_name" property="serviceName"/>
+        <result column="cron" property="cron"/>
+    </resultMap>
+
+    <sql id="taskColumns">
+        uuid, task_code, task_name, service_name, cron, status, sort, remark,
+        create_user_id, update_user_id, create_time, update_time
+    </sql>
+
+    <select id="selectPage" resultMap="TaskListMap">
+        SELECT t.uuid, t.task_code, t.task_name, t.service_name, t.cron, t.status, t.sort,
+               t.remark, t.update_time,
+               latest.status AS latest_run_status,
+               latest.result_summary AS latest_result_summary,
+               latest.started_time AS latest_started_time,
+               latest.finished_time AS latest_finished_time
+        FROM sys_scheduled_task t
+        LEFT JOIN sys_scheduled_task_run latest ON latest.uuid = (
+            SELECT r.uuid
+            FROM sys_scheduled_task_run r
+            WHERE r.task_id = t.uuid
+            ORDER BY r.started_time DESC, r.uuid DESC
+            LIMIT 1
+        )
+        WHERE 1 = 1
+        <if test="name != null and name != ''">
+            AND t.task_name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        <if test="code != null and code != ''">
+            AND t.task_code LIKE CONCAT('%', #{code}, '%')
+        </if>
+        <if test="status != null">
+            AND t.status = #{status}
+        </if>
+        ORDER BY t.sort ASC, t.uuid ASC
+    </select>
+
+    <select id="selectByCode" resultMap="TaskMap">
+        SELECT <include refid="taskColumns"/>
+        FROM sys_scheduled_task
+        WHERE task_code = #{taskCode}
+    </select>
+
+    <select id="selectActiveByCode" resultMap="TaskMap">
+        SELECT <include refid="taskColumns"/>
+        FROM sys_scheduled_task
+        WHERE task_code = #{taskCode} AND status = 1
+    </select>
+
+    <select id="selectEnabledByService" resultMap="TaskDefinitionMap">
+        SELECT uuid, task_code, task_name, service_name, cron
+        FROM sys_scheduled_task
+        WHERE service_name = #{serviceName} AND status = 1
+        ORDER BY sort ASC, uuid ASC
+    </select>
+</mapper>

@@ -16,6 +16,36 @@ CREATE TABLE IF NOT EXISTS sys_config (
     UNIQUE KEY uk_sys_config_key (config_key)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统配置表';
 
+CREATE TABLE IF NOT EXISTS sys_scheduled_task (
+    uuid           VARCHAR(32)  NOT NULL PRIMARY KEY COMMENT '主键',
+    task_code      VARCHAR(64)  NOT NULL COMMENT '任务编码，全局唯一',
+    task_name      VARCHAR(100) NOT NULL COMMENT '任务名称',
+    service_name   VARCHAR(64)  NOT NULL COMMENT '执行任务的服务名称',
+    cron           VARCHAR(64)  NOT NULL COMMENT 'Spring Cron执行表达式',
+    status         TINYINT      NOT NULL DEFAULT 1 COMMENT '状态 0-停用 1-启用',
+    sort           INT          NOT NULL DEFAULT 0 COMMENT '排序',
+    remark         VARCHAR(500) NULL COMMENT '备注',
+    create_user_id VARCHAR(32)  NULL COMMENT '创建人uuid',
+    update_user_id VARCHAR(32)  NULL COMMENT '更新人uuid',
+    create_time    DATETIME     NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time    DATETIME     NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    UNIQUE KEY uk_sys_scheduled_task_code (task_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统定时任务表';
+
+CREATE TABLE IF NOT EXISTS sys_scheduled_task_run (
+    uuid           VARCHAR(32)  NOT NULL PRIMARY KEY COMMENT '本次执行uuid',
+    task_id        VARCHAR(32)  NOT NULL COMMENT '任务uuid，关联 sys_scheduled_task.uuid',
+    status         TINYINT      NOT NULL COMMENT '0-执行中 1-成功 2-失败',
+    result_summary VARCHAR(500) NULL COMMENT '执行结果摘要',
+    result_json    JSON         NULL COMMENT '任务执行结果明细',
+    error_message  VARCHAR(500) NULL COMMENT '失败原因',
+    started_time   DATETIME     NOT NULL COMMENT '开始时间',
+    finished_time  DATETIME     NULL COMMENT '结束时间',
+    create_time    DATETIME     NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time    DATETIME     NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    KEY idx_sys_scheduled_task_run_task_time (task_id, started_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统定时任务执行记录表';
+
 CREATE TABLE IF NOT EXISTS sys_file (
     uuid           VARCHAR(32)  NOT NULL PRIMARY KEY COMMENT '主键',
     file_name      VARCHAR(200) NOT NULL COMMENT '原始文件名',

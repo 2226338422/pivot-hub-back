@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pivothub.system.mapper.SysScheduledTaskRunMapper">
+    <resultMap id="TaskRunMap" type="com.pivothub.pojo.vo.system.ScheduledTaskRunVo">
+        <id column="uuid" property="uuid"/>
+        <result column="task_id" property="taskId"/>
+        <result column="status" property="status"/>
+        <result column="result_summary" property="resultSummary"/>
+        <result column="result_json" property="resultJson"/>
+        <result column="error_message" property="errorMessage"/>
+        <result column="started_time" property="startedTime"/>
+        <result column="finished_time" property="finishedTime"/>
+    </resultMap>
+
+    <select id="selectPageByTaskId" resultMap="TaskRunMap">
+        SELECT uuid, task_id, status, result_summary, result_json, error_message,
+               started_time, finished_time
+        FROM sys_scheduled_task_run
+        WHERE task_id = #{taskId}
+        ORDER BY started_time DESC, uuid DESC
+    </select>
+
+    <select id="selectById" resultMap="TaskRunMap">
+        SELECT uuid, task_id, status, result_summary, result_json, error_message,
+               started_time, finished_time
+        FROM sys_scheduled_task_run
+        WHERE uuid = #{runId}
+    </select>
+
+    <insert id="insert" parameterType="com.pivothub.pojo.po.system.SysScheduledTaskRun">
+        INSERT INTO sys_scheduled_task_run
+            (uuid, task_id, status, result_summary, result_json, error_message,
+             started_time, finished_time, create_time, update_time)
+        VALUES
+            (#{uuid}, #{taskId}, #{status}, #{resultSummary},
+             #{resultJson,jdbcType=VARCHAR}, #{errorMessage,jdbcType=VARCHAR},
+             #{startedTime}, #{finishedTime}, #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="finish" parameterType="com.pivothub.pojo.po.system.SysScheduledTaskRun">
+        UPDATE sys_scheduled_task_run
+        SET status = #{status},
+            result_summary = #{resultSummary,jdbcType=VARCHAR},
+            result_json = #{resultJson,jdbcType=VARCHAR},
+            error_message = #{errorMessage,jdbcType=VARCHAR},
+            finished_time = #{finishedTime},
+            update_time = NOW()
+        WHERE uuid = #{uuid} AND status = 0
+    </update>
+</mapper>
