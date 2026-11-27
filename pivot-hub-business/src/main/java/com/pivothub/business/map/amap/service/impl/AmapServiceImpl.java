@@ -22,6 +22,8 @@ import com.pivothub.pojo.dto.business.map.amap.AmapRouteRequestDto;
 import com.pivothub.pojo.dto.business.map.amap.AmapSearchRequestDto;
 import com.pivothub.pojo.vo.business.map.amap.MapCityOptionVo;
 import com.pivothub.pojo.vo.business.map.amap.MapCityVo;
+import com.pivothub.pojo.vo.business.map.amap.MapCoordinateVo;
+import com.pivothub.pojo.vo.business.map.amap.MapProvinceBoundaryVo;
 import com.pivothub.pojo.vo.business.map.amap.MapRoutePathVo;
 import com.pivothub.pojo.vo.business.map.amap.MapRouteVo;
 import com.pivothub.pojo.vo.business.map.amap.MapReverseGeocodeVo;
@@ -36,9 +38,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 @Service
 public class AmapServiceImpl implements AmapService {
+    private static final int GPS_CONVERSION_BATCH_SIZE = 40;
+
     @Autowired
     private AmapProperties properties;
     @Autowired
@@ -294,6 +299,65 @@ public class AmapServiceImpl implements AmapService {
             throw AmapHttpClient.failure(endpoint, FailureReason.UPSTREAM_FORMAT,
                     endpoint == Endpoint.TRANSIT ? FailureStage.TRANSIT_PARSE : FailureStage.ROUTE_PARSE, null, null);
         }
+    }
+
+    @Override
+    public MapProvinceBoundaryVo provinceBoundary(String adcode, String operatorId) {
+        JsonNode root = get(Endpoint.DISTRICTS,
+                Map.of("keywords", adcode, "subdistrict", "0", "extensions", "all"), operatorId);
+        for (JsonNode province : array(root.path("districts"))) {
+            if (!adcode.equals(districtAdcode(province.path("adcode")))
+                    || !"province".equals(province.path("level").asText())) {
+                continue;
+            }
+            String name = districtName(province.path("name"));
+            String outlines = text(province.path("polyline"));
+            if (name == null || outlines == null) {
+                break;
+            }
+            List<List<MapCoordinateVo>> boundaries = new ArrayList<>();
+            for (String outline : outlines.split("\\|")) {
+                List<List<BigDecimal>> vertices = polyline(outline);
+                if (vertices.size() < 3) {
+                    throw unavailable();
+                }
+                boundaries.add(vertices.stream().map(AmapServiceImpl::asCoordinate).toList());
+            }
+            if (!boundaries.isEmpty()) {
+                return new MapProvinceBoundaryVo(name, boundaries);
+            }
+        }
+        throw unavailable();
+    }
+
+    @Override
+    public List<MapCoordinateVo> convertGpsCoordinates(List<MapCoordinateVo> locations, String operatorId) {
+        List<MapCoordinateVo> converted = new ArrayList<>(locations.size());
+        for (int start = 0; start < locations.size(); start += GPS_CONVERSION_BATCH_SIZE) {
+            List<MapCoordinateVo> batch = locations.subList(start, Math.min(start + GPS_CONVERSION_BATCH_SIZE, locations.size()));
+            String input = batch.stream()
+                    .map(location -> gpsNumber(location.getLongitude()) + "," + gpsNumber(location.getLatitude()))
+                    .collect(Collectors.joining("|"));
+            JsonNode root = get(Endpoint.GPS_CONVERT, Map.of("locations", input, "coordsys", "gps"), operatorId);
+            String output = text(root.path("locations"));
+            if (output == null) {
+                throw unavailable();
+            }
+            List<List<BigDecimal>> points = polyline(output);
+            if (points.size() != batch.size()) {
+                throw unavailable();
+            }
+            points.stream().map(AmapServiceImpl::asCoordinate).forEach(converted::add);
+        }
+        return converted;
+    }
+
+    private static String gpsNumber(double number) {
+        return BigDecimal.valueOf(number).setScale(6, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString();
+    }
+
+    private static MapCoordinateVo asCoordinate(List<BigDecimal> values) {
+        return new MapCoordinateVo(values.get(0).doubleValue(), values.get(1).doubleValue());
     }
 
     private JsonNode get(Endpoint endpoint, Map<String, String> input, String operatorId) {

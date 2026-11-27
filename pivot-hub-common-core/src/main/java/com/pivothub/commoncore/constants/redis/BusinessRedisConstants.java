@@ -18,4 +18,5 @@ public class BusinessRedisConstants {
     public static final String MAP_TYPHOON_DETAIL_CACHE_KEY_PREFIX = MAP_TYPHOON_CACHE_PREFIX + "detail:";
     public static final String MAP_TYPHOON_LOCK_SUFFIX = ":rlock";
     public static final String MAP_TYPHOON_BACKOFF_SUFFIX = ":backoff";
+    public static final String MAP_TYPHOON_FORECAST_LOCK_KEY = KEY_BUSINESS_UNITE_PREFIX + "map:typhoon:forecast:run";
 }

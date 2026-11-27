@@ -10,6 +10,7 @@ import com.pivothub.commoncore.constants.redis.BusinessRedisConstants;
 import com.pivothub.commoncore.util.CacheUtil;
 import com.pivothub.pojo.vo.business.map.typhoon.TyphoonDetailVo;
 import com.pivothub.pojo.vo.business.map.typhoon.TyphoonListVo;
+import com.pivothub.pojo.vo.business.map.typhoon.TyphoonSummaryVo;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -36,17 +39,32 @@ public class TyphoonServiceImpl implements TyphoonService {
 
     private static final Logger LOG = LoggerFactory.getLogger(TyphoonServiceImpl.class);
 
-    @Override
-    public TyphoonListVo list() {
+    private TyphoonListVo listCurrent() {
         return cached(BusinessRedisConstants.MAP_TYPHOON_LIST_CACHE_KEY, TyphoonListVo.class, client::fetchList);
     }
 
     @Override
-    public TyphoonDetailVo detail(String typhoonId) {
+    public TyphoonListVo list(Instant replayAt) {
+        if (replayAt == null) {
+            return listCurrent();
+        }
+        TyphoonListVo annualList = client.fetchList(replayAt.atOffset(ZoneOffset.UTC).getYear());
+        annualList.setTyphoons(annualList.getTyphoons().parallelStream()
+                .map(TyphoonSummaryVo::getId)
+                .distinct()
+                .map(id -> client.fetchDetail(id, replayAt))
+                .filter(Objects::nonNull)
+                .map(TyphoonDetailVo::getTyphoon)
+                .toList());
+        annualList.setFetchedAt(Instant.now().toString());
+        return annualList;
+    }
+
+    private TyphoonDetailVo currentDetail(String typhoonId) {
         if (typhoonId == null || !typhoonId.matches("[0-9]{1,12}")) {
             throw new BusinessException(400, "台风标识格式不正确");
         }
-        TyphoonListVo available = list();
+        TyphoonListVo available = listCurrent();
         boolean active = available.getTyphoons().stream().anyMatch(item -> typhoonId.equals(item.getId()));
         if (!active) {
             if (available.isStale()) throw new BusinessException(503, "台风列表更新延迟，请稍后重新加载");
@@ -55,6 +73,18 @@ public class TyphoonServiceImpl implements TyphoonService {
         TyphoonDetailVo result = cached(BusinessRedisConstants.MAP_TYPHOON_DETAIL_CACHE_KEY_PREFIX + typhoonId,
                 TyphoonDetailVo.class, () -> client.fetchDetail(typhoonId));
         if (available.isStale()) result.setStale(true);
+        return result;
+    }
+
+    @Override
+    public TyphoonDetailVo detail(String typhoonId, Instant replayAt) {
+        if (replayAt == null) {
+            return currentDetail(typhoonId);
+        }
+        TyphoonDetailVo result = client.fetchDetail(typhoonId, replayAt);
+        if (result == null) {
+            throw new BusinessException(404, "该台风在回放时刻未处于活跃状态");
+        }
         return result;
     }
 

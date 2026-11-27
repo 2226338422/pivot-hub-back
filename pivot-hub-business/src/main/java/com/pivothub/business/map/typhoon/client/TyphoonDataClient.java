@@ -98,14 +98,22 @@ public class TyphoonDataClient {
     }
 
     public TyphoonListVo fetchList() {
-        return parseList(request("list_default"));
+        return fetchList("list_default", true);
+    }
+
+    public TyphoonListVo fetchList(int year) {
+        return fetchList("list_" + year, false);
     }
 
     public TyphoonDetailVo fetchDetail(String typhoonId) {
+        return fetchDetail(typhoonId, null);
+    }
+
+    public TyphoonDetailVo fetchDetail(String typhoonId, Instant replayAt) {
         if (typhoonId == null || !typhoonId.matches("[0-9]{1,12}")) {
             throw new BusinessException(400, "台风标识格式错误");
         }
-        return parseDetail(request("view_" + typhoonId), typhoonId);
+        return parseDetail(request("view_" + typhoonId), typhoonId, replayAt);
     }
 
     private URI resolveUri(String path) {
@@ -208,15 +216,15 @@ public class TyphoonDataClient {
         };
     }
 
-    private TyphoonListVo parseList(String body) {
-        JsonNode rows = parseJsonp(body, "typhoon_jsons_list_default").get("typhoonList");
+    private TyphoonListVo fetchList(String resource, boolean activeOnly) {
+        JsonNode rows = parseJsonp(request(resource), "typhoon_jsons_" + resource).get("typhoonList");
         if (rows == null || !rows.isArray()) {
             throw unavailable();
         }
         List<TyphoonSummaryVo> typhoons = new ArrayList<>();
         for (JsonNode row : rows) {
             TyphoonSummaryVo summary = summary(row);
-            if (summary.isActive()) {
+            if (!activeOnly || summary.isActive()) {
                 typhoons.add(summary);
             }
         }
@@ -228,7 +236,7 @@ public class TyphoonDataClient {
         return result;
     }
 
-    private TyphoonDetailVo parseDetail(String body, String typhoonId) {
+    private TyphoonDetailVo parseDetail(String body, String typhoonId, Instant replayAt) {
         JsonNode row = parseJsonp(body, "typhoon_jsons_view_" + typhoonId).get("typhoon");
         TyphoonSummaryVo summary = summary(row);
         if (!typhoonId.equals(summary.getId()) || row.size() < 9 || !row.get(8).isArray()) {
@@ -237,15 +245,35 @@ public class TyphoonDataClient {
         List<TyphoonObservationVo> observations = new ArrayList<>();
         JsonNode latest = null;
         String latestTime = null;
+        TyphoonForecastVo replayForecast = null;
+        boolean hasLaterObservation = false;
         for (JsonNode point : row.get(8)) {
             TyphoonObservationVo observation = observation(point);
             if (observation != null) {
+                if (replayAt != null && Instant.parse(observation.getTime()).isAfter(replayAt)) {
+                    hasLaterObservation = true;
+                    continue;
+                }
                 observations.add(observation);
                 if (latestTime == null || observation.getTime().compareTo(latestTime) >= 0) {
                     latest = point;
                     latestTime = observation.getTime();
                 }
+                if (replayAt != null) {
+                    TyphoonForecastVo candidate = forecast(point, replayAt);
+                    if (candidate != null && (replayForecast == null
+                            || candidate.getIssuedAt().compareTo(replayForecast.getIssuedAt()) > 0)) {
+                        replayForecast = candidate;
+                    }
+                }
             }
+        }
+        if (replayAt != null) {
+            if (latestTime == null || (!summary.isActive() && !hasLaterObservation
+                    && Instant.parse(latestTime).isBefore(replayAt))) {
+                return null;
+            }
+            summary.setActive(true);
         }
         if (observations.isEmpty()) {
             throw unavailable();
@@ -259,7 +287,7 @@ public class TyphoonDataClient {
         TyphoonDetailVo result = new TyphoonDetailVo();
         result.setTyphoon(summary);
         result.setObservations(observations);
-        result.setForecast(forecast(latest));
+        result.setForecast(replayAt == null ? forecast(latest, null) : replayForecast);
         result.setSource(TyphoonConstants.SOURCE);
         result.setSourceUrl(resolveUri("web.html").toString());
         result.setSourceUpdatedAt(latestTime);
@@ -363,7 +391,7 @@ public class TyphoonDataClient {
         return result;
     }
 
-    private TyphoonForecastVo forecast(JsonNode observation) {
+    private TyphoonForecastVo forecast(JsonNode observation, Instant replayAt) {
         JsonNode agencies = observation.get(11);
         if (agencies == null || !agencies.isObject() || agencies.isEmpty()) {
             return null;
@@ -391,6 +419,9 @@ public class TyphoonDataClient {
                 Double longitude = number(row.get(2), -180, 180);
                 Double latitude = number(row.get(3), -90, 90);
                 if (hours == null || hours % 1 != 0 || issued == null || longitude == null || latitude == null) {
+                    continue;
+                }
+                if (replayAt != null && Instant.parse(issued).isAfter(replayAt)) {
                     continue;
                 }
                 if (issuedAt != null && !issuedAt.equals(issued)) {

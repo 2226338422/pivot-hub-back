@@ -8,6 +8,8 @@ import com.pivothub.pojo.dto.business.map.amap.AmapRouteRequestDto;
 import com.pivothub.pojo.dto.business.map.amap.AmapSearchRequestDto;
 import com.pivothub.pojo.vo.business.map.amap.MapCityOptionVo;
 import com.pivothub.pojo.vo.business.map.amap.MapCityVo;
+import com.pivothub.pojo.vo.business.map.amap.MapCoordinateVo;
+import com.pivothub.pojo.vo.business.map.amap.MapProvinceBoundaryVo;
 import com.pivothub.pojo.vo.business.map.amap.MapRouteVo;
 import com.pivothub.pojo.vo.business.map.amap.MapReverseGeocodeVo;
 import com.pivothub.pojo.vo.PageVo;
@@ -79,4 +81,20 @@ public interface AmapService {
      * @return 路线分段折线、距离、耗时和步骤，无可用路线时返回空路线
      */
     MapRouteVo route(AmapRouteRequestDto request, String operatorId);
+
+    /**
+     * @Description: 按省级行政区编码查询高德坐标系边界
+     * @param adcode 六位行政区编码
+     * @param operatorId 调用者标识，用于限流
+     * @return 行政区名称和边界轮廓
+     */
+    MapProvinceBoundaryVo provinceBoundary(String adcode, String operatorId);
+
+    /**
+     * @Description: 按输入顺序将WGS84坐标转换为高德坐标
+     * @param locations 待转换坐标
+     * @param operatorId 调用者标识，用于限流
+     * @return 转换后的等长坐标列表
+     */
+    List<MapCoordinateVo> convertGpsCoordinates(List<MapCoordinateVo> locations, String operatorId);
 }

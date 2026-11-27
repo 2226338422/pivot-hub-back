@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
+
 /** 已登录且拥有台风菜单权限的用户查询台风实况和机构预报。 */
 @RestController
 @MenuPermission("map_typhoon")
@@ -24,15 +26,18 @@ public class TyphoonController {
 
     @Operation(summary = "查询活跃台风列表")
     @GetMapping("/list")
-    public Result<TyphoonListVo> list(HttpServletResponse response) {
+    public Result<TyphoonListVo> list(@RequestParam(name = "replayAt", required = false) Instant replayAt,
+                                      HttpServletResponse response) {
         response.setHeader(HttpHeaders.CACHE_CONTROL, "no-store");
-        return Result.success(typhoonService.list());
+        return Result.success(typhoonService.list(replayAt));
     }
 
     @Operation(summary = "查询台风实况路径及最新预报")
     @GetMapping("/detail")
-    public Result<TyphoonDetailVo> detail(@RequestParam(name = "typhoonId") String typhoonId, HttpServletResponse response) {
+    public Result<TyphoonDetailVo> detail(@RequestParam(name = "typhoonId") String typhoonId,
+                                          @RequestParam(name = "replayAt", required = false) Instant replayAt,
+                                          HttpServletResponse response) {
         response.setHeader(HttpHeaders.CACHE_CONTROL, "no-store");
-        return Result.success(typhoonService.detail(typhoonId));
+        return Result.success(typhoonService.detail(typhoonId, replayAt));
     }
 }

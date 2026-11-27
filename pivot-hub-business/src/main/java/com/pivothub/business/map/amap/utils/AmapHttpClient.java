@@ -43,6 +43,7 @@ public class AmapHttpClient {
         IP("restapi.amap.com", "/v3/ip"), IP_V5("restapi.amap.com", "/v5/ip"),
         REGEO("restapi.amap.com", "/v3/geocode/regeo"), GEO("restapi.amap.com", "/v3/geocode/geo"),
         CONVERT("restapi.amap.com", "/v3/coordinate/convert"),
+        GPS_CONVERT("restapi.amap.com", "/v3/assistant/coordinate/convert"),
         DISTRICTS("restapi.amap.com", "/v3/config/district"),
         TIPS("restapi.amap.com", "/v3/assistant/inputtips"),
         POIS("restapi.amap.com", "/v3/place/text"), POI_DETAIL("restapi.amap.com", "/v3/place/detail"),
