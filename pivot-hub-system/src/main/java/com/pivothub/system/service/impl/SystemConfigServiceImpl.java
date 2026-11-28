@@ -12,6 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,6 +25,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class SystemConfigServiceImpl implements SystemConfigService {
+    private static final DateTimeFormatter DATETIME_FORMAT = DateTimeFormatter
+            .ofPattern("uuuu-MM-dd HH:mm:ss").withResolverStyle(ResolverStyle.STRICT);
+
     @Autowired
     private SysConfigMapper configMapper;
 
@@ -62,6 +69,17 @@ public class SystemConfigServiceImpl implements SystemConfigService {
             throw new SystemException(400, "该配置暂无可用选项");
         }
         String trimmed = value.trim();
+        if (type == SystemConfigType.DATETIME) {
+            if (trimmed.isEmpty()) {
+                return "";
+            }
+            try {
+                LocalDateTime.parse(trimmed, DATETIME_FORMAT);
+                return trimmed;
+            } catch (DateTimeParseException ex) {
+                throw new SystemException(400, "日期时间配置值须符合 yyyy-MM-dd HH:mm:ss 格式");
+            }
+        }
         try {
             return switch (type) {
                 case SWITCH -> {

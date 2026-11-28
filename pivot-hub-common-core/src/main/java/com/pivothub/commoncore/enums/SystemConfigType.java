@@ -7,7 +7,8 @@ public enum SystemConfigType implements ValueEnum<Integer> {
     INTEGER(3, "整数"),
     DECIMAL(4, "小数"),
     SINGLE_SELECT(5, "单选"),
-    MULTI_SELECT(6, "多选");
+    MULTI_SELECT(6, "多选"),
+    DATETIME(7, "日期时间");
 
     private final Integer value;
     private final String name;

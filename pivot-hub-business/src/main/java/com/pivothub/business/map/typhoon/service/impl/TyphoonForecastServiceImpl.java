@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.pivothub.business.map.typhoon.service.TyphoonForecastService;
 import com.pivothub.business.map.typhoon.service.TyphoonService;
 import com.pivothub.business.map.typhoon.utils.TyphoonProvinceForecast;
+import com.pivothub.common.feign.SystemConfigClient;
 import com.pivothub.common.feign.SystemMessageTemplateClient;
 import com.pivothub.common.feign.SystemUserClient;
 import com.pivothub.common.notify.mq.NotifyMqProducer;
@@ -27,6 +28,11 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -38,11 +44,16 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static com.pivothub.commoncore.constants.system.SystemSettingsConstants.TYPHOON_FORECAST_QUERY_TIME_KEY;
+
 @Service
 public class TyphoonForecastServiceImpl implements TyphoonForecastService {
     private static final Logger LOG = LoggerFactory.getLogger(TyphoonForecastServiceImpl.class);
     private static final String MESSAGE_TYPE = NotifyMessageType.TYPHOON.getValue();
     private static final int MAX_ERROR_LENGTH = 500;
+    private static final ZoneId CHINA_ZONE = ZoneId.of("Asia/Shanghai");
+    private static final DateTimeFormatter CONFIG_TIME_FORMAT = DateTimeFormatter
+            .ofPattern("uuuu-MM-dd HH:mm:ss").withResolverStyle(ResolverStyle.STRICT);
 
     @Autowired
     private TyphoonService typhoonService;
@@ -53,6 +64,9 @@ public class TyphoonForecastServiceImpl implements TyphoonForecastService {
     @Lazy
     @Autowired
     private SystemMessageTemplateClient templateClient;
+    @Lazy
+    @Autowired
+    private SystemConfigClient configClient;
     @Lazy
     @Autowired
     private SystemUserClient systemUserClient;
@@ -73,7 +87,9 @@ public class TyphoonForecastServiceImpl implements TyphoonForecastService {
         List<String> errors = new ArrayList<>();
         String resultSummary = "任务执行失败";
         try {
-            TyphoonListVo list = typhoonService.list(startedAt);
+            Instant forecastAt = forecastTime(startedAt);
+            TyphoonListVo list = typhoonService.list(forecastAt);
+            result.put("forecastAt", forecastAt);
             List<TyphoonSummaryVo> activeStorms = activeStorms(list.getTyphoons());
             resultSummary = activeStorms.isEmpty() ? "无活跃台风" : activeStorms.size() + "个活跃台风";
             result.put("stale", list.isStale());
@@ -89,7 +105,7 @@ public class TyphoonForecastServiceImpl implements TyphoonForecastService {
                 recipientsByPreference.keySet().forEach(provinces::addAll);
                 // 从本次执行时间起检查预测路径是否经过用户所选省份。
                 TyphoonProvinceForecastResultDto forecast =
-                        provinceForecast.match(activeStorms, provinces, startedAt, startedAt);
+                        provinceForecast.match(activeStorms, provinces, startedAt, forecastAt);
                 result.put("forecastMatches", forecast.getMatches());
                 result.put("unavailableForecastStormIds", forecast.getUnavailableStormIds());
                 result.put("unavailableProvinceCodes", forecast.getUnavailableProvinceCodes());
@@ -122,6 +138,18 @@ public class TyphoonForecastServiceImpl implements TyphoonForecastService {
         executionResult.setResultJson(JSON.toJSONString(result));
         executionResult.setErrorMessage(error);
         return executionResult;
+    }
+
+    private Instant forecastTime(Instant startedAt) {
+        String configured = configClient.getConfigValue(TYPHOON_FORECAST_QUERY_TIME_KEY);
+        if (configured == null || configured.isBlank()) {
+            return startedAt;
+        }
+        try {
+            return LocalDateTime.parse(configured.trim(), CONFIG_TIME_FORMAT).atZone(CHINA_ZONE).toInstant();
+        } catch (DateTimeParseException ex) {
+            throw new IllegalArgumentException("台风预报查询时间配置格式错误", ex);
+        }
     }
 
     /** 对上游返回的活跃台风按 ID 去重，保留每个 ID 首次出现的记录和顺序。 */

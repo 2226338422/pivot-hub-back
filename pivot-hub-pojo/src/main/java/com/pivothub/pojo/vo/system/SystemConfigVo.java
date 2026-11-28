@@ -12,7 +12,7 @@ public class SystemConfigVo {
     private String configKey;
     @Schema(description = "配置名称")
     private String configName;
-    @Schema(description = "配置类型：1-文本，2-开关，3-整数，4-小数，5-单选，6-多选")
+    @Schema(description = "配置类型：1-文本，2-开关，3-整数，4-小数，5-单选，6-多选，7-日期时间")
     private Integer configType;
     @Schema(description = "配置值，按文本返回")
     private String configValue;

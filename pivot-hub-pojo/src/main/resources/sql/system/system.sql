@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS sys_config (
     config_key     VARCHAR(100) NOT NULL COMMENT '配置键',
     config_value   TEXT         NULL COMMENT '配置值',
     config_name    VARCHAR(100) NULL COMMENT '配置名称',
-    config_type    TINYINT      NULL COMMENT '表单类型 1-文本 2-开关 3-整数 4-小数 5-单选 6-多选',
+    config_type    TINYINT      NULL COMMENT '表单类型 1-文本 2-开关 3-整数 4-小数 5-单选 6-多选 7-日期时间',
     status         TINYINT      NOT NULL DEFAULT 1 COMMENT '状态 0-禁用 1-正常',
     remark         VARCHAR(500) NULL COMMENT '备注',
     create_user_id VARCHAR(32)  NULL COMMENT '创建人uuid',
