@@ -8,6 +8,11 @@ INSERT INTO sys_role (uuid, code, name, defa, sort, status)
 SELECT REPLACE(UUID(), '-', ''), 'admin', '管理员', 0, 0, 1
 WHERE NOT EXISTS (SELECT 1 FROM sys_role WHERE code = 'admin');
 
+-- 默认角色。
+INSERT INTO sys_role (uuid, code, name, defa, sort, status)
+SELECT REPLACE(UUID(), '-', ''), 'default_user', '普通用户', 1, 0, 1
+WHERE NOT EXISTS (SELECT 1 FROM sys_role WHERE code = 'default_user');
+
 -- 顶级菜单。
 INSERT INTO sys_menu (uuid, code, menu_name, parent_id, web_url, icon, sort, status)
 SELECT REPLACE(UUID(), '-', ''), seed.code, seed.menu_name, '0',
