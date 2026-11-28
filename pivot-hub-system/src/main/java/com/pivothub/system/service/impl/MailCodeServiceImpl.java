@@ -3,7 +3,10 @@ package com.pivothub.system.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.pivothub.commoncore.constants.redis.SystemRedisConstants;
+import com.pivothub.commoncore.enums.MailCodeScene;
 import com.pivothub.commoncore.util.CacheUtil;
+import com.pivothub.pojo.dto.system.email.MailTemplateContentDto;
+import com.pivothub.system.email.service.MailTemplateService;
 import com.pivothub.system.util.EmailApiUtil;
 import com.pivothub.system.mapper.SysMailCodeMapper;
 import com.pivothub.system.service.MailCodeService;
@@ -13,7 +16,7 @@ import org.springframework.util.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
@@ -25,10 +28,13 @@ public class MailCodeServiceImpl implements MailCodeService {
     private CacheUtil cacheUtil;
     @Autowired
     private EmailApiUtil emailApiUtil;
+    @Autowired
+    private MailTemplateService mailTemplateService;
 
     @Override
     public void sendCode(String email, String scene) {
-        if (!StringUtils.hasText(email) || !Set.of("login", "register", "reset", "rebind").contains(scene)) {
+        MailCodeScene mailCodeScene = MailCodeScene.findByValue(scene);
+        if (!StringUtils.hasText(email) || mailCodeScene == null) {
             throw new IllegalArgumentException("邮箱或验证码场景无效");
         }
         String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
@@ -46,7 +52,7 @@ public class MailCodeServiceImpl implements MailCodeService {
         mailCode.setUuid(IdWorker.getIdStr());
         mailCode.setEmail(normalizedEmail);
         mailCode.setCode(code);
-        mailCode.setScene(scene);
+        mailCode.setScene(mailCodeScene.getValue());
         mailCode.setUsed(0);
         mailCode.setExpireTime(new Date(now.getTime() + TimeUnit.MINUTES.toMillis(SystemRedisConstants.MAIL_CODE_TTL)));
         mailCode.setCreateTime(now);
@@ -55,7 +61,13 @@ public class MailCodeServiceImpl implements MailCodeService {
             throw new IllegalStateException("验证码保存失败");
         }
         try {
-            if (!emailApiUtil.sendEmailCode(code, SystemRedisConstants.MAIL_CODE_TTL, normalizedEmail)) {
+            MailTemplateContentDto template = mailTemplateService.render("email_code", Map.of(
+                    "name", "用户",
+                    "code", code,
+                    "ttl", SystemRedisConstants.MAIL_CODE_TTL,
+                    "scene", mailCodeScene.getName()
+            ));
+            if (!emailApiUtil.sendEmailCode(template.getSubject(), template.getBody(), normalizedEmail)) {
                 throw new IllegalStateException("验证码邮件发送失败");
             }
         } catch (Exception ex) {
@@ -69,8 +81,12 @@ public class MailCodeServiceImpl implements MailCodeService {
         if (!StringUtils.hasText(email) || !StringUtils.hasText(scene) || !StringUtils.hasText(code)) {
             return false;
         }
+        MailCodeScene mailCodeScene = MailCodeScene.findByValue(scene.trim());
+        if (mailCodeScene == null) {
+            return false;
+        }
         String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
-        var mailCode = mapper.selectUsable(normalizedEmail, scene.trim(), new Date());
+        var mailCode = mapper.selectUsable(normalizedEmail, mailCodeScene.getValue(), new Date());
         if (mailCode == null || !code.trim().equals(mailCode.getCode())) {
             return false;
         }

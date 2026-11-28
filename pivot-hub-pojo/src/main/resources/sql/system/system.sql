@@ -319,3 +319,17 @@ CREATE TABLE IF NOT EXISTS sys_message_template (
     update_time   DATETIME    NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     UNIQUE KEY uk_sys_message_template_type (message_type)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='消息模板表';
+
+CREATE TABLE IF NOT EXISTS sys_mail_template (
+    uuid             VARCHAR(32)  NOT NULL PRIMARY KEY COMMENT '主键',
+    template_code    VARCHAR(64)  NOT NULL COMMENT '模板编码',
+    template_name    VARCHAR(100) NOT NULL COMMENT '模板名称',
+    subject_template VARCHAR(255) NOT NULL COMMENT '邮件主题模板',
+    body_template    MEDIUMTEXT   NOT NULL COMMENT 'HTML 邮件正文模板',
+    status           TINYINT      NOT NULL DEFAULT 1 COMMENT '状态：0-停用 1-启用',
+    create_user_id   VARCHAR(32)  NULL COMMENT '创建人',
+    update_user_id   VARCHAR(32)  NULL COMMENT '更新人',
+    create_time      DATETIME     NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time      DATETIME     NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    UNIQUE KEY uk_sys_mail_template_code (template_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='邮件模板表';

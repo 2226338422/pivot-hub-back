@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pivothub.system.email.mapper.SysMailTemplateMapper">
+    <resultMap id="SysMailTemplateResultMap" type="com.pivothub.pojo.po.system.SysMailTemplate">
+        <id column="uuid" property="uuid"/>
+        <result column="template_code" property="templateCode"/>
+        <result column="template_name" property="templateName"/>
+        <result column="subject_template" property="subjectTemplate"/>
+        <result column="body_template" property="bodyTemplate"/>
+        <result column="status" property="status"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="update_user_id" property="updateUserId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="selectEnabledByCode" resultMap="SysMailTemplateResultMap">
+        SELECT uuid, template_code, template_name, subject_template, body_template,
+               status, create_user_id, update_user_id, create_time, update_time
+        FROM sys_mail_template
+        WHERE template_code = #{templateCode} AND status = 1
+        LIMIT 1
+    </select>
+</mapper>
